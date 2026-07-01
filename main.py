@@ -9,10 +9,8 @@ def start():
     """Intialize and start the Plume Application"""
     gui = MainWindow()
 
-    gui.window.mainloop()
+    gui.mainloop()
 
 
 
-start()    
-
-print("hello im trying to get git to work")
+start()
