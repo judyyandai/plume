@@ -7,6 +7,7 @@ class Laser():
         # Initialize the controller with PIRL laser selected
         self.option = "PIRL"
         
+        #Event to track if the laser is on or off
         self.e_laserOn = Event()
 
 
@@ -23,7 +24,10 @@ class Laser():
         RETURN 
             None.
         """
-        
+        if self.e_laserOn.is_set():
+            print("Cannot change laser option while laser is on.")
+            return
+
         if option == "PIRL":
             if self.option != "PIRL":
                 self.option = "PIRL"

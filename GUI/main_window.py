@@ -2,9 +2,10 @@
 
 import tkinter as tk
 from tkinter import ttk
-from GUI.frames.laser_option import LaserOptionFrame
-from GUI.frames.laser_control import LaserControlFrame
 
+
+from GUI.frames.laser_control import LaserControlFrame
+from logic.experiment import Experiment
 from logic.laser import Laser
 
 
@@ -30,17 +31,6 @@ class MainWindow(tk.Tk):
 
         # Frames
         laser = Laser() # Create an instance of the Laser class to manage the laser state.
-        self.laserOptionFrame = LaserOptionFrame(
-            parent=self.Experiment_Frame, 
-            laser=laser, 
-            on_option_changed = self.option_changed)
-        self.laserControlFrame = LaserControlFrame(parent=self.Experiment_Frame, laser=laser)
+        experiment = Experiment() # Create an instance of the Experiment class to manage the experiment state.
+        self.laserControlFrame = LaserControlFrame(parent=self.Experiment_Frame, laser=laser, experiment=experiment)
 
-
-     def option_changed(self):
-        """
-        DESCRIPTION:
-            When laser is option is changed in the Laser Option Frame,
-            Laser Control Frame is updated accordingly.
-        """
-        self.laserControlFrame.update_b_beginMeasure()
