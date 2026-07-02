@@ -18,7 +18,7 @@ class Laser():
 
 
 
-     # !!! to implement
+     # !!! all functions need to be implement
     def toggle(self):
         """
         DESCRIPTION:
@@ -33,7 +33,6 @@ class Laser():
 
 
 
-    # !!! needs to be implemented
     def change_option(self, option):
         """
         DESCRIPTION:
