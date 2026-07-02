@@ -21,6 +21,7 @@ class MainWindow(tk.Tk):
         super().__init__()
         self.title("Plume GUI 2026")
         self.geometry("1100x1300")
+        self.option_add("*Font", "Roboto 12")
 
         # Experiment tab, currently there are no other tabs, but future expansions may include additional tabs for other functionalities.
         self.notebook = ttk.Notebook(self)
