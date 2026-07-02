@@ -2,8 +2,10 @@
 
 import tkinter as tk
 from tkinter import ttk
-from GUI.frames.laser_option import LaserOptionFrame
+
+
 from GUI.frames.laser_control import LaserControlFrame
+from logic.experiment import Experiment
 from GUI.frames.heater_control import HeatingControlFrame
 
 from logic.laser import Laser
@@ -22,6 +24,7 @@ class MainWindow(tk.Tk):
         super().__init__()
         self.title("Plume GUI 2026")
         self.geometry("1100x1300")
+        self.option_add("*Font", "Roboto 12")
 
         # Experiment tab, currently there are no other tabs, but future expansions may include additional tabs for other functionalities.
         self.notebook = ttk.Notebook(self)
@@ -32,6 +35,10 @@ class MainWindow(tk.Tk):
 
         # Frames
         laser = Laser() # Create an instance of the Laser class to manage the laser state.
+        experiment = Experiment() # Create an instance of the Experiment class to manage the experiment state.
+        self.laserControlFrame = LaserControlFrame(parent=self.Experiment_Frame, laser=laser, experiment=experiment)
+
+
         heater = Heater() # Create an instance of the PID Heater class to manage the heater state.
         self.laserOptionFrame = LaserOptionFrame(
             parent=self.Experiment_Frame, 
