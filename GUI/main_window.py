@@ -4,8 +4,10 @@ import tkinter as tk
 from tkinter import ttk
 from GUI.frames.laser_option import LaserOptionFrame
 from GUI.frames.laser_control import LaserControlFrame
+from GUI.frames.heater_control import HeatingControlFrame
 
 from logic.laser import Laser
+from logic.PIDheater import Heater
 
 
 class MainWindow(tk.Tk):
@@ -30,11 +32,13 @@ class MainWindow(tk.Tk):
 
         # Frames
         laser = Laser() # Create an instance of the Laser class to manage the laser state.
+        heater = Heater() # Create an instance of the PID Heater class to manage the heater state.
         self.laserOptionFrame = LaserOptionFrame(
             parent=self.Experiment_Frame, 
             laser=laser, 
             on_option_changed = self.option_changed)
         self.laserControlFrame = LaserControlFrame(parent=self.Experiment_Frame, laser=laser)
+        self.heaterControlFrame = HeatingControlFrame(parent = self.Experiment_Frame, heater = heater)
 
 
      def option_changed(self):
