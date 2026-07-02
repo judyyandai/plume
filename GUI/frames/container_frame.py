@@ -1,4 +1,5 @@
 # Parent Class for all frames in the GUI
+# Creates border and label for each frame
 
 import tkinter as tk
 

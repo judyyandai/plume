@@ -1,13 +1,11 @@
 # Plume experiment GUI main window
-# created by Judy Dai and Robyn Astridge, ,major work done by Enzo Picini, Chloe Lawson, Kenny Lai, Gabriel Caribe, and Daniel Pinto
-
 
 import tkinter as tk
 from tkinter import ttk
-from tkinter import font
 from GUI.frames.laser_option import LaserOptionFrame
 from GUI.frames.laser_control import LaserControlFrame
-import json # used for talking with config.json, which stores configuration variables for the GUI. 
+
+from logic.laser import Laser
 
 
 class MainWindow(tk.Tk):
@@ -23,6 +21,7 @@ class MainWindow(tk.Tk):
         self.title("Plume GUI 2026")
         self.geometry("1100x1300")
 
+        # Experiment tab, currently there are no other tabs, but future expansions may include additional tabs for other functionalities.
         self.notebook = ttk.Notebook(self)
         self.notebook.pack(expand = True, fill = 'both')
         self.Experiment_Frame = tk.Frame(self.notebook, width = 1700, height = 1440)
@@ -30,8 +29,18 @@ class MainWindow(tk.Tk):
         self.notebook.add(self.Experiment_Frame, text = "Experiment")
 
         # Frames
-        self.laser_option_frame = LaserOptionFrame(self.Experiment_Frame)
+        laser = Laser() # Create an instance of the Laser class to manage the laser state.
+        self.laserOptionFrame = LaserOptionFrame(
+            parent=self.Experiment_Frame, 
+            laser=laser, 
+            on_option_changed = self.option_changed)
+        self.laserControlFrame = LaserControlFrame(parent=self.Experiment_Frame, laser=laser)
 
-        self.laser_control_frame = LaserControlFrame(self.Experiment_Frame)
 
-
+     def option_changed(self):
+        """
+        DESCRIPTION:
+            When laser is option is changed in the Laser Option Frame,
+            Laser Control Frame is updated accordingly.
+        """
+        self.laserControlFrame.update_b_beginMeasure()
