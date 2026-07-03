@@ -53,9 +53,6 @@ class MainWindow(tk.Tk):
             data_manager = dataManager)
 
 
-        laser = Laser() # Create an instance of the Laser class to manage the laser state.
-        experiment = Experiment() # Create an instance of the Experiment class to manage the experiment state.
-
         # Create a canvas for scrollable content
         canvas = tk.Canvas(self.Experiment_Frame, width=500, height = 1500)
         canvas.pack(side="left", anchor = "nw", padx=5, pady= 20)
@@ -73,18 +70,8 @@ class MainWindow(tk.Tk):
         canvas.create_window((0, 0), window=self.scrollbar_frame, anchor="nw")
 
         # Frames inside Scrollable Content:
+        self.heaterControlFrame = HeatingControlFrame(parent = self.scrollbar_frame, heater = heater, data_manager=dataManager)
         self.inputsFrame = InputsFrame(parent = self.scrollbar_frame)
         self.folderFrame = FolderFrame(parent = self.inputsFrame, data_manager=dataManager)
-
-        heater = Heater() # Create an instance of the PID Heater class to manage the heater state.
-        self.heaterControlFrame = HeatingControlFrame(parent = self.scrollbar_frame, heater = heater, data_manager=dataManager)
-
         self.cameraFrame = CameraFrame(parent = self.scrollbar_frame, data_manager=dataManager)
 
-     def option_changed(self):
-        """
-        DESCRIPTION:
-            When laser is option is changed in the Laser Option Frame,
-            Laser Control Frame is updated accordingly.
-        """
-        self.laserControlFrame.update_b_beginMeasure()

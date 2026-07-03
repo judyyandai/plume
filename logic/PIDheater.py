@@ -30,12 +30,6 @@ class Heater:
 
     
     def target_temp(self, temp):
-        # method is in PluPy in original code
-        print ("setting target temp to", temp)
-    
-
-
-    def target_temp(self):
         """
         DESCRIPTION:
             Sends the new Target Temp value to heater box + saves it to the Tkinter variable.
@@ -44,6 +38,10 @@ class Heater:
         RETURN: 
             None.
         """
+        # method is in PluPy in original code
+        print ("setting target temp to", temp)
+    
+
         # if self.connection:
         #     with self.communication_lock:
         #         self.connection.reset_input_buffer()  # Clear input buffer before starting
