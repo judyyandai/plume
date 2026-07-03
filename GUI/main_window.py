@@ -5,11 +5,13 @@ from tkinter import ttk
 
 
 from GUI.frames.laser_control import LaserControlFrame
-from logic.experiment import Experiment
 from GUI.frames.heater_control import HeatingControlFrame
 
 from logic.laser import Laser
 from logic.PIDheater import Heater
+from logic.experiment import Experiment
+
+from logic.data_manager import DataManager
 
 
 class MainWindow(tk.Tk):
@@ -33,20 +35,23 @@ class MainWindow(tk.Tk):
         self.Experiment_Frame.pack()
         self.notebook.add(self.Experiment_Frame, text = "Experiment")
 
+
+        # Create instances of objects
+        dataManager = DataManager()
+        laser = Laser() 
+        experiment = Experiment() 
+        heater = Heater()
+
+
         # Frames
-        laser = Laser() # Create an instance of the Laser class to manage the laser state.
-        experiment = Experiment() # Create an instance of the Experiment class to manage the experiment state.
-        self.laserControlFrame = LaserControlFrame(parent=self.Experiment_Frame, laser=laser, experiment=experiment)
+        self.laserControlFrame = LaserControlFrame(
+            parent=self.Experiment_Frame, 
+            laser=laser, 
+            experiment=experiment, 
+            data_manager = dataManager)
 
+        self.heaterControlFrame = HeatingControlFrame(
+            parent = self.Experiment_Frame, 
+            heater = heater,
+            data_manager = dataManager)
 
-        heater = Heater() # Create an instance of the PID Heater class to manage the heater state.
-        self.heaterControlFrame = HeatingControlFrame(parent = self.Experiment_Frame, heater = heater)
-
-
-     def option_changed(self):
-        """
-        DESCRIPTION:
-            When laser is option is changed in the Laser Option Frame,
-            Laser Control Frame is updated accordingly.
-        """
-        self.laserControlFrame.update_b_beginMeasure()

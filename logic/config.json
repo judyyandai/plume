@@ -17,7 +17,7 @@
     "power stop": 1100.0,
     "power step size": 22.0,
     "power measurements per step": 7,
-    "shots wanted": 500,
+    "shots wanted": 100,
     "Kp": 0.4,
     "Ki": 0.0,
     "Kd": 0.0,

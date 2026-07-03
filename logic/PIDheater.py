@@ -9,6 +9,7 @@ class Heater:
 
         self.e_heaterOn = Event()
 
+    # !!! need to be implemented
     def toggle(self):
         """
         DESCRIPTION:
@@ -19,45 +20,12 @@ class Heater:
             None.
         """
         self.e_heaterOn.set() if not self.e_heaterOn.is_set() else self.e_heaterOn.clear()
+
+
+    def set_coeff(self, coeff, val):
+        print("coeff set to", coeff, "with value", val)
     
-    def set_Kp(self):
-        """
-        DESCRIPTION:
-            Sends the new Kp value to heater box + saves it to the Tkinter variable.
-            Kp is the proportional constant in the PID heater system.
-        PARAMETERS
-            None.
-        RETURN: 
-            None.
-        """
-        # EntryBox.on_enter(self.V_K_p, self.entryK_p) 
-        # self.heater.set_coeff("Kp", self.V_K_p.get())
 
-    def set_Ki(self):
-        """
-        DESCRIPTION:
-            Sends the new Ki value to heater box + saves it to the Tkinter variable.
-            Ki is the integral constant in the PID heater system.
-        PARAMETERS
-            None
-        RETURN: 
-            None.
-        """
-        # EntryBox.on_enter(self.V_K_i, self.entryK_i) 
-        # self.heater.set_coeff("Ki", self.V_K_i.get())
-
-    def set_Kd(self):
-        """
-        DESCRIPTION:
-            Sends the new Kd value to heater box + saves it to the Tkinter variable.
-            Kd is the derivative constant in the PID heater system.
-        PARAMETERS
-            None.
-        RETURN: 
-            None.
-        """
-        # EntryBox.on_enter(self.V_K_d, self.entryK_d) 
-        # self.heater.set_coeff("Kd", self.V_K_d.get())
 
 # stuff below to be implemented when we start to deal with all the connections to the computer
 

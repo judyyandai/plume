@@ -5,7 +5,7 @@ from tkinter import messagebox
 
 class EntryBox:
         
-        def __init__(self, frame, label_text, variable, function = None, send = True, width = 10):
+        def __init__(self, frame, label_text, variable, data_manager, function = None, send = True, width = 10):
             """
             DESCRIPTION: 
                 Wrapper class for tk.Entry, tk.Label, and tk.Button. Allows user to create a single object that holds them all. 
@@ -24,6 +24,7 @@ class EntryBox:
 
             self.variable = variable
             self.function = function
+            self.data_manager = data_manager
 
             self.entry_frame = tk.Frame(frame)
             self.entry_frame.pack(anchor = 'w', pady = 5)
@@ -42,7 +43,7 @@ class EntryBox:
             if send:
                 self.send_button = tk.Button(self.entry_frame, 
                                              text = "Send", 
-                                             command = self.on_enter)
+                                             command = function)
                 self.send_button.pack(side = tk.LEFT)
             self.disabled = False
         
@@ -60,11 +61,9 @@ class EntryBox:
             try:
                 value = float(self.entry.get())
                 self.variable.set(value)
-                # self.update_config_file() # updates config file. 
+                self.data_manager.update_config_file() # updates config file. 
                 print(f"Value set to: {value}")
 
-                if self.function is not None:
-                    self.function()
 
             except ValueError:
                 messagebox.showinfo(title ="Invalid Input", message = "Please enter a valid input and try again!")

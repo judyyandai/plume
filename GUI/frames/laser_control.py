@@ -3,19 +3,24 @@
 import tkinter as tk
 from tkinter import ttk
 from GUI.frames.container_frame import ContainerFrame
-
+from GUI.widgets.entry_box import EntryBox
+from tkinter import messagebox
+ 
 class LaserControlFrame(ContainerFrame):
-    def __init__(self, parent, laser, experiment):
+    def __init__(self, parent, laser, experiment, data_manager):
         super().__init__(parent, "Laser Control Panel")
         self.laser = laser
         self.experiment = experiment
-        row_1 = tk.Frame(self)
-        row_1.pack(anchor="w", pady=(15, 15))
+        self.data_manager = data_manager
 
+        
         # Default to PIRL selected
         self.laser_option = tk.StringVar(value = "PIRL")
 
         # Row 1: Q-Tune and PIRL radio buttons
+        row_1 = tk.Frame(self)
+        row_1.pack(anchor="w", pady=(15, 15))
+
         self.rb_QTune = tk.Radiobutton(
             row_1,
             text="Q-Tune",
@@ -116,6 +121,14 @@ class LaserControlFrame(ContainerFrame):
             padx = 15)
         self.rb_noprepulse.pack(anchor="w")
 
+        # Entry box for getting a specifc number of laser shots through the shutter (only relevant to PIRL)
+        self.entry_shot_count = EntryBox(
+            frame = gallop_frame, 
+            label_text = "Request open-shutter shots [#]", 
+            variable = self.data_manager.V_shot_count,
+            data_manager = self.data_manager,
+            function = self.start_shot_count, 
+            send= True)
 
 
     # Methods for toggling objects
@@ -169,8 +182,10 @@ class LaserControlFrame(ContainerFrame):
             self.enable_laser_mode()
         if self.laser.option == "Q-Tune":
             self.update_toggle_buttons_QTune()
+            self.entry_shot_count.disable()
         else:
             self.update_toggle_buttons_PIRL()
+            self.entry_shot_count.enable()
 
         self.update_b_startLaser_text()
         self.update_b_beginMeasure_text()
@@ -315,7 +330,6 @@ class LaserControlFrame(ContainerFrame):
 
 
 
-    # Method to create dropdown
     def create_dropdown(self, frame):
         """
         DESCRIPTION:
@@ -346,5 +360,28 @@ class LaserControlFrame(ContainerFrame):
         dropdown.current(self.pirl_PRR_options.index("100 Hz")) # sets 100 Hz to be the default
         
         return dropdown
+    
+
+    def start_shot_count(self):
+        """
+        DESCRIPTION:
+            Request Teensy open shutter for the requested number of laser pulses. Do some error checking and confirmation first.
+        PARAMETERS
+            None.
+        RETURN: 
+            None.
+        """
+        if not self.laser.e_laserOn.is_set(): # if Laser is OFF
+            messagebox.showinfo(title = 'Laser not on!', message = 'You must turn the laser on BEFORE requesting a fixed number of shots!')
+            return
+        else:
+            req_shot_count = self.entry_shot_count.entry.get()
+            if messagebox.askyesno(
+                title = "Shot count", 
+                message = f"Confirm requested shot count: {req_shot_count}. This will open the shutter for {req_shot_count} laser pulses."):
+                self.entry_shot_count.on_enter()
+                # message = f"shot_count:{req_shot_count}"    ->  !!! to be implemented when logic is placed (create teensy object)
+                # self.teensy.message(message)
+                print(f"GUI sent shot request for {req_shot_count} shots")
     
    
