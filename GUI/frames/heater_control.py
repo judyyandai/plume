@@ -6,10 +6,11 @@ from GUI.frames.container_frame import ContainerFrame
 from GUI.widgets.entry_box import EntryBox
 
 class HeatingControlFrame(ContainerFrame):
-    def __init__(self, parent, heater):
+    def __init__(self, parent, heater, data_manager):
         super().__init__(parent, "PID Heater Control Panel")
 
         self.heater = heater
+        self.data_manager= data_manager
 
         # Turn Heater On Button
         self.b_pidOnOff = tk.Button(self, 
@@ -29,18 +30,13 @@ class HeatingControlFrame(ContainerFrame):
         self.tempLabel = tk.Label(self, textvariable=self.heaterStatusText, font = "Roboto 16")
         self.tempLabel.pack(padx = 10, pady = 10)
 
-        # delete when config.json is done
 
-        self.V_targetTemp = tk.DoubleVar(value = 2)
-        self.V_Kp = tk.DoubleVar(value = 1)
-        self.V_Ki = tk.DoubleVar(value = 1)
-        self.V_Kd = tk.DoubleVar(value = 1)
+        self.entry_Kp = EntryBox(self, "K_p", self.data_manager.V_Kp, self.data_manager, self.set_Kp)
+        self.entry_Ki = EntryBox(self, "K_i", self.data_manager.V_Ki, self.data_manager, self.set_Ki)
+        self.entry_Kd = EntryBox(self, "K_d", self.data_manager.V_Kd, self.data_manager, self.set_Kd)
 
-        self.entry_targetTemp = EntryBox(self, "Target Temp", self.V_targetTemp, heater.target_temp)
+        self.entry_Kd.disable()
 
-        self.entry_Kp = EntryBox(self, "K_p", self.V_Kp, heater.set_Kp)
-        self.entry_Ki = EntryBox(self, "K_i", self.V_Ki, heater.set_Ki)
-        self.entry_Kd = EntryBox(self, "K_d", self.V_Kd, heater.set_Kd)
     
     def heater_toggle(self):
         self.heater.toggle()
@@ -53,3 +49,43 @@ class HeatingControlFrame(ContainerFrame):
         else:
             self.b_pidOnOff.config(text = "Turn Heater ON")
             print("Heater turned off")
+
+
+    def set_Kp(self):
+        """
+        DESCRIPTION:
+            Sends the new Kp value to heater box + saves it to the Tkinter variable.
+            Kp is the proportional constant in the PID heater system.
+        PARAMETERS
+            None.
+        RETURN: 
+            None.
+        """
+        self.entry_Kp.on_enter() 
+        self.heater.set_coeff("Kp", self.data_manager.V_Kp)
+
+    def set_Ki(self):
+        """
+        DESCRIPTION:
+            Sends the new Ki value to heater box + saves it to the Tkinter variable.
+            Ki is the integral constant in the PID heater system.
+        PARAMETERS
+            None
+        RETURN: 
+            None.
+        """
+        self.entry_Ki.on_enter() 
+        self.heater.set_coeff("Ki", self.data_manager.V_Ki)
+
+    def set_Kd(self):
+        """
+        DESCRIPTION:
+            Sends the new Kd value to heater box + saves it to the Tkinter variable.
+            Kd is the derivative constant in the PID heater system.
+        PARAMETERS
+            None.
+        RETURN: 
+            None.
+        """
+        self.entry_Kd.on_enter() 
+        self.heater.set_coeff("Kd", self.data_manager.V_Kd)

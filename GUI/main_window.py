@@ -5,13 +5,16 @@ from tkinter import ttk
 
 
 from GUI.frames.laser_control import LaserControlFrame
-from logic.experiment import Experiment
 from GUI.frames.heater_control import HeatingControlFrame
 from GUI.frames.inputs_frame import InputsFrame
 from GUI.frames.folder_frame import FolderFrame
+from GUI.frames.camera_frame import CameraFrame
 
 from logic.laser import Laser
 from logic.PIDheater import Heater
+from logic.experiment import Experiment
+
+from logic.data_manager import DataManager
 
 
 class MainWindow(tk.Tk):
@@ -35,10 +38,24 @@ class MainWindow(tk.Tk):
         self.Experiment_Frame.pack()
         self.notebook.add(self.Experiment_Frame, text = "Experiment")
 
+
+        # Create instances of objects
+        dataManager = DataManager()
+        laser = Laser() 
+        experiment = Experiment() 
+        heater = Heater()
+
+
         # Frames
+        self.laserControlFrame = LaserControlFrame(
+            parent=self.Experiment_Frame, 
+            laser=laser, 
+            experiment=experiment,
+            data_manager = dataManager)
+
+
         laser = Laser() # Create an instance of the Laser class to manage the laser state.
         experiment = Experiment() # Create an instance of the Experiment class to manage the experiment state.
-        self.laserControlFrame = LaserControlFrame(parent=self.Experiment_Frame, laser=laser, experiment=experiment)
 
         # Create a canvas for scrollable content
         canvas = tk.Canvas(self.Experiment_Frame, width=500, height = 1500)
@@ -57,11 +74,13 @@ class MainWindow(tk.Tk):
         canvas.create_window((0, 0), window=self.scrollbar_frame, anchor="nw")
 
         # Frames inside Scrollable Content:
-        self.inputsFrame = InputsFrame(parent=self.Experiment_Frame)
-        self.folderFrame = FolderFrame(parent = self.inputsFrame)
+        self.inputsFrame = InputsFrame(parent = self.scrollbar_frame)
+        self.folderFrame = FolderFrame(parent = self.inputsFrame, data_manager=dataManager)
 
         heater = Heater() # Create an instance of the PID Heater class to manage the heater state.
-        self.heaterControlFrame = HeatingControlFrame(parent = self.scrollbar_frame, heater = heater)
+        self.heaterControlFrame = HeatingControlFrame(parent = self.scrollbar_frame, heater = heater, data_manager=dataManager)
+
+        self.cameraFrame = CameraFrame(parent = self.scrollbar_frame, data_manager=dataManager)
 
      def option_changed(self):
         """
