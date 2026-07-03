@@ -40,11 +40,6 @@ class MainWindow(tk.Tk):
 
 
         heater = Heater() # Create an instance of the PID Heater class to manage the heater state.
-        self.laserOptionFrame = LaserOptionFrame(
-            parent=self.Experiment_Frame, 
-            laser=laser, 
-            on_option_changed = self.option_changed)
-        self.laserControlFrame = LaserControlFrame(parent=self.Experiment_Frame, laser=laser)
         self.heaterControlFrame = HeatingControlFrame(parent = self.Experiment_Frame, heater = heater)
 
 
