@@ -59,6 +59,26 @@ class Heater:
         # EntryBox.on_enter(self.V_K_d, self.entryK_d) 
         # self.heater.set_coeff("Kd", self.V_K_d.get())
 
+    def target_temp(self):
+        """
+        DESCRIPTION:
+            Sends the new Target Temp value to heater box + saves it to the Tkinter variable.
+        PARAMETERS
+            None.
+        RETURN: 
+            None.
+        """
+        # if self.connection:
+        #     with self.communication_lock:
+        #         self.connection.reset_input_buffer()  # Clear input buffer before starting
+        #         self.connection.reset_output_buffer() # Clear output buffer
+        #         command = f"temp:{temp}"
+        #         self.connection.write(bytearray(command,'ascii'))
+        
+        #         self.display_response_message()
+        # else:
+        #     print("GUI Heater not connected! heater.target_temp() failed. ")
+
 # stuff below to be implemented when we start to deal with all the connections to the computer
 
 # class Heater:

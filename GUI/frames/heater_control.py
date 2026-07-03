@@ -29,9 +29,14 @@ class HeatingControlFrame(ContainerFrame):
         self.tempLabel = tk.Label(self, textvariable=self.heaterStatusText, font = "Roboto 16")
         self.tempLabel.pack(padx = 10, pady = 10)
 
+        # delete when config.json is done
+
+        self.V_targetTemp = tk.DoubleVar(value = 2)
         self.V_Kp = tk.DoubleVar(value = 1)
         self.V_Ki = tk.DoubleVar(value = 1)
         self.V_Kd = tk.DoubleVar(value = 1)
+
+        self.entry_targetTemp = EntryBox(self, "Target Temp", self.V_targetTemp, heater.target_temp)
 
         self.entry_Kp = EntryBox(self, "K_p", self.V_Kp, heater.set_Kp)
         self.entry_Ki = EntryBox(self, "K_i", self.V_Ki, heater.set_Ki)
