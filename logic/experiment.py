@@ -1,9 +1,13 @@
-#
 from threading import Event
 
 class Experiment():
     def __init__(self):
+        """
+        DESCRIPTION:
 
+        PARAMETERS:
+
+        """
         # Event to track if the experiment is running or not
         self.e_experimentOn = Event()
 

@@ -3,7 +3,6 @@
 import tkinter as tk
 from tkinter import ttk
 
-
 from GUI.frames.laser_control import LaserControlFrame
 from GUI.frames.heater_control import HeatingControlFrame
 

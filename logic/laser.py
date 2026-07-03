@@ -3,7 +3,12 @@ from threading import Event
 
 class Laser():
     def __init__(self):
+        """
+        DESCRIPTION:
 
+        PARAMETERS:
+
+        """
         # Initialize the controller with PIRL laser selected, Regular Pulse, 100 Hz frequency
         self.option = "PIRL"
         self.mode = "Regular Pulse"

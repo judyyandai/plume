@@ -1,12 +1,15 @@
-# Heater Class Definition
-
 from threading import Thread, Event, Lock
 import time
 from GUI.widgets.entry_box import EntryBox
 
 class Heater:
     def __init__(self):
+        """
+        DESCRIPTION:
 
+        PARAMETERS:
+
+        """
         self.e_heaterOn = Event()
 
     # !!! need to be implemented
@@ -24,6 +27,11 @@ class Heater:
 
     def set_coeff(self, coeff, val):
         print("coeff set to", coeff, "with value", val)
+
+    
+    def target_temp(self, temp):
+        # method is in PluPy in original code
+        print ("setting target temp to", temp)
     
 
 

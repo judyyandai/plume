@@ -1,5 +1,3 @@
-# Class for reading, writing, and modifying config.json files
-
 import json
 import tkinter as tk
 import os
@@ -7,6 +5,12 @@ import numpy as np
 
 class DataManager:
     def __init__(self, filename = "config.json"):
+        """
+        DESCRIPTION:
+            Class used to handle loading and updating config.json files
+        PARAMETERS:
+            filename - (str) name of file it will use, has to be in same file location as this script
+        """
         self.filename = filename
 
         #* Loading saved config - any default values that are saved in the entry box and appear on start are in this config.json and can be saved

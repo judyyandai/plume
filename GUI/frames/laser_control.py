@@ -1,13 +1,25 @@
-#Frame for laser control panel
-
 import tkinter as tk
 from tkinter import ttk
 from GUI.frames.container_frame import ContainerFrame
 from GUI.widgets.entry_box import EntryBox
 from tkinter import messagebox
+from GUI.widgets.tool_tip import ToolTip
  
+
 class LaserControlFrame(ContainerFrame):
     def __init__(self, parent, laser, experiment, data_manager):
+        """
+        DESCRIPTION:
+            Class used to create the laser control panel which contains:
+                - laser option (PIRL or Q-Tune) selection
+                - 'Start Laser' and 'Begin Measure' buttons
+                - laser mode (Regular and Gallop) selection and their respective attributes
+        PARAMETERS:
+            parent - (tk.Frame) the frame laser control frame is placed in
+            laser - (Laser) handles the state of the laser
+            experiment - (Experiment) handles the state of the experiment
+            data_manager - (dataManager) accesses and updates config.json files
+        """
         super().__init__(parent, "Laser Control Panel")
         self.laser = laser
         self.experiment = experiment
@@ -28,8 +40,8 @@ class LaserControlFrame(ContainerFrame):
             command=self.change_laser_option,
             value="Q-Tune"
         )
-
         self.rb_QTune.pack(anchor="w")
+        ToolTip(self.rb_QTune, "qTune_option_button")
 
         self.rb_PIRL = tk.Radiobutton(
             row_1,
@@ -39,6 +51,7 @@ class LaserControlFrame(ContainerFrame):
             value="PIRL"
         )
         self.rb_PIRL.pack(anchor="w")
+        ToolTip(self.rb_PIRL, "pirl_option_button")
 
         # Row 2: Start Laser and Begin Measuring buttons
         row_2 = tk.Frame(self)
@@ -51,6 +64,7 @@ class LaserControlFrame(ContainerFrame):
             command= self.laser_toggle
         )
         self.b_startLaser.pack(side="left", padx=20)
+        ToolTip(self.b_startLaser, "LaserStart")
 
 
         self.b_beginMeasure = tk.Button(
@@ -61,6 +75,7 @@ class LaserControlFrame(ContainerFrame):
             state = 'disabled'
         )
         self.b_beginMeasure.pack(side="left", padx=20)
+        ToolTip(self.b_beginMeasure, "Measure")
 
         # Row 3: Radio buttons for laser mode (Regular Pulse or Gallop) + additional options for each mode
         row_3 = tk.Frame(self)
@@ -77,8 +92,8 @@ class LaserControlFrame(ContainerFrame):
             variable=self.laser_mode,
             command = self.change_laser_mode,
             value = "Regular Pulse")
-        
         self.rb_regPulse.pack(anchor = 'nw', side = 'top')
+        ToolTip(self.rb_regPulse, "regular_pulse_button")
 
         # Frequency dropdown menu and shot count request
         regPulseMenu = tk.Frame(row_3)
@@ -94,6 +109,7 @@ class LaserControlFrame(ContainerFrame):
             command = self.change_laser_mode,
             value = "Gallop")
         self.rb_gallop.pack(anchor = 'nw', side = 'top')
+        ToolTip(self.rb_gallop, 'gallop mode')
 
         # Prepulse modes
         gallop_frame = tk.Frame(row_3)
@@ -110,6 +126,7 @@ class LaserControlFrame(ContainerFrame):
             state = "disabled",
             padx = 15)
         self.rb_prepulse .pack(anchor = "w")
+        ToolTip(self.rb_prepulse , "prepulse")
 
         self.rb_noprepulse =tk.Radiobutton(
             gallop_frame, 
@@ -120,6 +137,7 @@ class LaserControlFrame(ContainerFrame):
             state = "disabled", 
             padx = 15)
         self.rb_noprepulse.pack(anchor="w")
+        ToolTip(self.rb_noprepulse, "no prepulse")
 
         # Entry box for getting a specifc number of laser shots through the shutter (only relevant to PIRL)
         self.entry_shot_count = EntryBox(
@@ -129,6 +147,7 @@ class LaserControlFrame(ContainerFrame):
             data_manager = self.data_manager,
             function = self.start_shot_count, 
             send= True)
+        ToolTip(self.entry_shot_count.label, 'shot count')
 
 
     # Methods for toggling objects
