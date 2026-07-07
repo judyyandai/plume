@@ -1,12 +1,12 @@
 import tkinter as tk
 from tkinter import ttk
-from GUI.frames.container_frame import ContainerFrame
+from GUI.frames.container import ContainerFrame
 from GUI.widgets.entry_box import EntryBox
 from tkinter import messagebox
 from GUI.widgets.tool_tip import ToolTip
  
 
-class LaserControlFrame(ContainerFrame):
+class LaserFrame(ContainerFrame):
     def __init__(self, parent, laser, experiment, data_manager):
         """
         DESCRIPTION:
@@ -399,7 +399,7 @@ class LaserControlFrame(ContainerFrame):
                 title = "Shot count", 
                 message = f"Confirm requested shot count: {req_shot_count}. This will open the shutter for {req_shot_count} laser pulses."):
                 self.entry_shot_count.on_enter()
-                # message = f"shot_count:{req_shot_count}"    ->  !!! to be implemented when logic is placed (create teensy object)
+                # message = f"shot_count:{req_shot_count}"    ->  !!! to be implemented when logic is placed
                 # self.teensy.message(message)
                 print(f"GUI sent shot request for {req_shot_count} shots")
     

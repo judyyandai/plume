@@ -1,8 +1,8 @@
 # Frame for Folder/Saving, lens height, lens focal length in the scrollbar
 
 import tkinter as tk
-from tkinter import ttk
 from GUI.widgets.entry_box import EntryBox
+from GUI.widgets.tool_tip import ToolTip
 
 class FolderFrame(tk.Frame):
     def __init__(self, parent, data_manager):
@@ -38,6 +38,8 @@ class FolderFrame(tk.Frame):
                                     send = True)
     
         folder_frame.pack(anchor="w", pady=5)
+        ToolTip(self.entry_lens_height.label, "lens height")
+        ToolTip(self.entry_focal_length.label, "focal length")
         
     def set_lens_focal_length(self):
         """

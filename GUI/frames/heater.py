@@ -1,10 +1,10 @@
 import tkinter as tk
 from tkinter import messagebox
-from GUI.frames.container_frame import ContainerFrame
+from GUI.frames.container import ContainerFrame
 from GUI.widgets.entry_box import EntryBox
 from GUI.widgets.tool_tip import ToolTip
 
-class HeatingControlFrame(ContainerFrame):
+class HeatingFrame(ContainerFrame):
     def __init__(self, parent, heater, data_manager):
         """
         DESCRIPTION:

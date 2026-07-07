@@ -3,16 +3,23 @@
 import tkinter as tk
 from tkinter import ttk
 
-from GUI.frames.laser_control import LaserControlFrame
-from GUI.frames.heater_control import HeatingControlFrame
-from GUI.frames.inputs_frame import InputsFrame
-from GUI.frames.folder_frame import FolderFrame
-from GUI.frames.camera_frame import CameraFrame
+from GUI.frames.laser import LaserFrame
+from GUI.frames.heater import HeatingFrame
+from GUI.frames.pulse_generator import PulseGeneratorFrame
+from GUI.frames.file import FileFrame
+from GUI.frames.folder import FolderFrame
+from GUI.frames.camera import CameraFrame
+from GUI.frames.pIRL import pIRLFrame
+from GUI.frames.qTune import QTuneFrame
+from GUI.frames.motor import MotorFrame
+from GUI.frames.rs_flash_delay import RSFlashDelay
 
 from logic.laser import Laser
 from logic.PIDheater import Heater
 from logic.experiment import Experiment
-
+from logic.pulse_generator import PulseGenerator
+from logic.motor import Motor
+from logic.flash_delay_series import FlashDelaySeries
 from logic.data_manager import DataManager
 
 
@@ -43,10 +50,13 @@ class MainWindow(tk.Tk):
         laser = Laser() 
         experiment = Experiment() 
         heater = Heater()
+        pg = PulseGenerator()
+        motor = Motor()
+        flash_delay_series = FlashDelaySeries()
 
 
         # Frames
-        self.laserControlFrame = LaserControlFrame(
+        self.laserControlFrame = LaserFrame(
             parent=self.Experiment_Frame, 
             laser=laser, 
             experiment=experiment,
@@ -70,8 +80,44 @@ class MainWindow(tk.Tk):
         canvas.create_window((0, 0), window=self.scrollbar_frame, anchor="nw")
 
         # Frames inside Scrollable Content:
-        self.heaterControlFrame = HeatingControlFrame(parent = self.scrollbar_frame, heater = heater, data_manager=dataManager)
-        self.inputsFrame = InputsFrame(parent = self.scrollbar_frame)
-        self.folderFrame = FolderFrame(parent = self.inputsFrame, data_manager=dataManager)
-        self.cameraFrame = CameraFrame(parent = self.scrollbar_frame, data_manager=dataManager)
+        self.heaterControlFrame = HeatingFrame(
+            parent = self.scrollbar_frame, 
+            heater = heater, 
+            data_manager=dataManager)
+
+        self.inputsFrame = FileFrame(
+            parent = self.scrollbar_frame)
+
+        self.folderFrame = FolderFrame(
+            parent = self.inputsFrame, 
+            data_manager=dataManager)
+
+        self.pgControlFrame = PulseGeneratorFrame(
+            parent = self.scrollbar_frame, 
+            data_manager = dataManager, 
+            pg = pg)
+        
+        self.cameraFrame = CameraFrame(
+            parent = self.scrollbar_frame, 
+            data_manager=dataManager)
+        
+        self.pIRLFrame = pIRLFrame(
+            parent = self.scrollbar_frame, 
+            data_manager=dataManager)
+        
+        self.qTuneFrame = QTuneFrame(
+            parent = self.scrollbar_frame, 
+            data_manager= dataManager)
+        
+        self.motorFrame = MotorFrame(
+            parent=self.scrollbar_frame, 
+            data_manager=dataManager, 
+            motor = motor)
+        
+ #       self.rsFlashDelayFrame = RSFlashDelay(
+ #           parent = self.scrollbar_frame, 
+ #           data_manager= dataManager, 
+ #           pg_control_frame= self.pgControlFrame, 
+ #           flash_delay_series= flash_delay_series)
+
 

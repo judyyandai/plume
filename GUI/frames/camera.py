@@ -1,10 +1,9 @@
 # Frame for camera settings
 
-import tkinter as tk
-from tkinter import ttk
-from GUI.frames.container_frame import ContainerFrame
+from GUI.frames.container import ContainerFrame
 from GUI.widgets.entry_box import EntryBox
-from tkinter import messagebox
+from GUI.widgets.tool_tip import ToolTip
+
 
 class CameraFrame(ContainerFrame):
     def __init__(self, parent, data_manager):
@@ -19,6 +18,7 @@ class CameraFrame(ContainerFrame):
             data_manager = self.data_manager,
             function = self.set_cam_gain, 
             send= True)
+        ToolTip(self.entry_Camera_Gain.label, "cam gain")
         
     def set_cam_gain(self):
         """
