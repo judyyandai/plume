@@ -107,7 +107,8 @@ class MainWindow(tk.Tk):
         
         self.qTuneFrame = QTuneFrame(
             parent = self.scrollbar_frame, 
-            data_manager= dataManager)
+            data_manager= dataManager,
+            laser = laser)
         
         self.motorFrame = MotorFrame(
             parent=self.scrollbar_frame, 

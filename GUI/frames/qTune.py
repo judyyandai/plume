@@ -2,10 +2,11 @@ from GUI.frames.container import ContainerFrame
 from GUI.widgets.entry_box import EntryBox
 
 class QTuneFrame(ContainerFrame):
-    def __init__(self, parent, data_manager):
+    def __init__(self, parent, data_manager, laser):
         super().__init__(parent, 'Q-Tune')
         self.parent = parent
         self.data_manager = data_manager
+        self.laser = laser
 
         self.entry_qTune_wavelength = EntryBox(self, "Q-Tune Wavelength (nm)", self.data_manager.V_qTune_wavelength, self.data_manager, self.set_qTune_wavelength)
         self.entry_qTune_pump = EntryBox(self, "OPO Pump Energy Level (%)", self.data_manager.V_qTune_pump, self.data_manager, self.set_qTune_pump)
@@ -22,8 +23,9 @@ class QTuneFrame(ContainerFrame):
             None
         """
         self.entry_qTune_wavelength.on_enter()
-        qtune_wavelength = self.data_manager.V_qTune_wavelength.get()
-        #qTune.changeWavelength(qtune_wavelength)
+        qTune_wavelength = self.data_manager.V_qTune_wavelength.get()
+        self.laser.change_qTune_wavelength(qTune_wavelength)
+        
 
     def set_qTune_pump(self):
         """
@@ -37,4 +39,4 @@ class QTuneFrame(ContainerFrame):
         
         self.entry_qTune_pump.on_enter()
         qTune_pump = self.data_manager.V_qTune_pump.get()
-        #qTune.changePumpLevel(qTune_pump)
+        self.laser.change_qTune_pump(qTune_pump)

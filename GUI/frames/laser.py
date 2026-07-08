@@ -119,7 +119,7 @@ class LaserFrame(ContainerFrame):
 
         self.rb_prepulse =tk.Radiobutton(
             gallop_frame, 
-            text="prepulse (2ms spacing)", 
+            text="prepulse (Q-Tune: 2ms/ PIRL: 4ms spacing)", 
             variable=self.pulse_spacing,
             command = self.change_laser_pulse_spacing, 
             value="prepulse",
@@ -184,6 +184,10 @@ class LaserFrame(ContainerFrame):
 
     def change_laser_pulse_spacing(self):
         pulse_spacing = self.pulse_spacing.get()
+        if pulse_spacing == "prepulse":
+            self.data_manager.V_prepulse = True
+        if pulse_spacing == "no prepulse":
+            self.data_manager.V_prepulse = False
         self.laser.change_pulse_spacing(pulse_spacing)
 
 
