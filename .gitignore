@@ -1,1 +1,6 @@
 .venv/
+# ignore all Python bytecode files
+*.pyc
+__pycache__/
+# ignore vscode config files
+.vscode/

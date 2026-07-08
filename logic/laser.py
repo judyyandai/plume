@@ -41,19 +41,21 @@ class Laser():
         """
         self.e_laserOn.set() if not self.e_laserOn.is_set() else self.e_laserOn.clear()
         if self.e_laserOn.is_set():
-            if self.option.get() == "Q-Tune":
+            if self.option == "Q-Tune":
                 qTune.runLaser()
+                print("Laser on")
             #elif self.option.get() == "PIRL": !!! deal with PIRL
                 # self.T_autocorrector = Thread(target = self.autocorrector, name = "T_autocorrector", args = ([None]))
                 # self.T_autocorrector.start()
             #    self.teensy.message("on")
 
         elif not self.e_laserOn.is_set():
-            if self.option.get() == "Q-Tune":
+            if self.option == "Q-Tune":
                 qTune.stopLaser()
+                print("Laser off")
             #elif self.option.get() == "PIRL":
             #    self.teensy.message("off")
-        print("Laser toggled")
+
 
 
 
@@ -66,7 +68,6 @@ class Laser():
         """
         self.option = option
         self.on_option_change()
-        print("Laser changed to", self.option)
 
 
 
@@ -96,7 +97,6 @@ class Laser():
             Changes to selected prepulse to ablation pulse spacing (only relevant in gallop mode with pirl)
         """
         self.pulse_spacing = pulse_spacing
-        print("In spacing mode:", self.pulse_spacing)
 
 
     def on_mode_change(self):
@@ -110,8 +110,8 @@ class Laser():
             
         """
 
-        if self.mode.get() == "Gallop Mode":
-            if self.option.get() == "PIRL":
+        if self.mode == "Gallop":
+            if self.option == "PIRL":
                 print(self.pulse_spacing.get())
                 # handle the two options within Gallop Mode
                 if self.pulse_spacing.get() == "prepulse":
@@ -131,13 +131,17 @@ class Laser():
             #if self.F_Experiment: #* if experiment is running, then stop it! Shouldn't be able to run experiment without Gallop  !!! is this needed?
 
             
-            if self.mode.get() == "Regular Pulse":
-                if self.option.get() == "PIRL":
+            if self.mode == "Regular Pulse":
+                if self.option == "PIRL":
                     # self.teensy.mode(0)
                     print("GUI set to pedal 0")
                 else:
                     qTune.gallopModeOff()
-                    print("Q-Tune now in Regular Pulse Mode")
+                    try:
+                        qTune.changeFrequency(10)
+                        print("Q-Tune now in Regular Pulse Mode, at 10Hz")
+                    except: 
+                        print("on_laser_change: Q-Tune is inactive.")
             else:
                 print("GUI ERROR Invalid Mode Command entered!")
 
@@ -151,13 +155,13 @@ class Laser():
         RETURN 
             None.
         """
-        if self.option.get() == "PIRL":
+        if self.option == "PIRL":
             # if Q-Tune is on but not the chosen laser, turn it off
             qTune.stopLaser()
             # self.teensy.message("q-tune please no") !!! fix when teensy is implemented
-        elif self.option.get() == "Q-Tune":
+        elif self.option == "Q-Tune":
             #Switch laser mode to Regular Pulse Mode
-            self.mode.set("Regular Pulse")
+            self.mode="Regular Pulse"
             #Default laser to 10 Hz
             try:
                 qTune.changeFrequency(10)
@@ -176,8 +180,8 @@ class Laser():
             None
         """
         # do Q-Tune frequency changes if laser is set at Q-Tune        
-        if self.option.get() == "Q-Tune":
-            selection = self.frequency.get()
+        if self.option == "Q-Tune":
+            selection = self.frequency
             freq, *rest = selection.split()
             qTune.changeFrequency(float(freq))
             print(f"GUI change frequency to {freq} Hz")
