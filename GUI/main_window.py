@@ -4,6 +4,7 @@ import tkinter as tk
 from tkinter import ttk
 from tkinter import messagebox
 import time
+import serial
 
 from GUI.frames.laser import LaserFrame
 from GUI.frames.heater import HeatingFrame
@@ -24,9 +25,22 @@ from logic.motor import Motor
 from logic.flash_delay_series import FlashDelaySeries
 from logic.data_manager import DataManager
 
+from logic.Plupy import Plupy as pl
+from logic.Plupy.pirl import pirl
+from logic.Plupy.pulse_generator import pulse_generator
+from logic.Plupy.teensy import teensy
+from logic.Plupy.oscilloscope import oscilloscope
+from logic.Plupy.function_generator import function_generator
+from logic.Plupy.vacuum_meter import vacuumMeter
+from logic.Plupy.heater import heater
+from logic.Plupy.arduino_UNO import arduino_UNO
+from logic.Plupy.stepper_motor import stepper_motor
+from logic.Plupy.thor_camera import thor_camera
+from logic.Plupy.Coherent import Coherent
+
 
 class MainWindow(tk.Tk):
-     def __init__(self):# and device_connections"
+     def __init__(self, device_connections):
         """
         DESCRIPTION:
             Initializes the main window of the GUI, sets up the layout, and initializes necessary components.
@@ -47,15 +61,30 @@ class MainWindow(tk.Tk):
         self.notebook.add(self.Experiment_Frame, text = "Experiment")
 
 
+        # Creating device objects  for GUI
+        COM_ports = pl.COM_ports
+        self.pirl_con, self.pg_con, self.motor_con, self.uno_con, self.teensy_con, self.vaccumMeter_con, self.heater_con, self.coherent_con = device_connections
+        self.pirl = pirl(COM_ports["pirl"],  19200, serial.EIGHTBITS, serial.PARITY_NONE, serial.STOPBITS_ONE, self.pirl_con)
+        self.pg = pulse_generator(COM_ports["pg"],  115200, serial.EIGHTBITS, serial.PARITY_NONE,  serial.STOPBITS_ONE, self.pg_con)
+        self.teensy = teensy(COM_ports["teensy"],  115200, serial.EIGHTBITS,  serial.PARITY_NONE, serial.STOPBITS_ONE, self.teensy_con)
+        self.osc_TDS2014C = oscilloscope("TDS 2014C")
+        self.osc_DPO2024B = oscilloscope("DPO 2024B")
+        self.fg = function_generator()
+        self.vacuumMeter = vacuumMeter(COM_ports["vacuumMeter"],  19200, serial.EIGHTBITS,  serial.PARITY_NONE, serial.STOPBITS_ONE, self.vaccumMeter_con) 
+        self.heater = heater(COM_ports["heater"],  19200, serial.EIGHTBITS,  serial.PARITY_NONE, serial.STOPBITS_ONE, self.heater_con)
+        self.uno = arduino_UNO(COM_ports["uno"],  115200, serial.EIGHTBITS,  serial.PARITY_NONE, serial.STOPBITS_ONE, self.uno_con)
+        self.motor = stepper_motor(COM_ports["motor"], 9600, serial.SEVENBITS, serial.PARITY_ODD, serial.STOPBITS_TWO, self.motor_con)
+        self.cam = thor_camera()
+        self.coherent = Coherent(COM_ports["Coherent"], 19200, serial.EIGHTBITS, serial.PARITY_NONE,  serial.STOPBITS_ONE, self.coherent_con)
+        
         # Create instances of objects
         self.dataManager = DataManager()
-        self.laser = Laser() 
+        self.laser = Laser(self.teensy) 
         self.experiment = Experiment() 
         self.heater = Heater()
         self.pg = PulseGenerator()
         self.motor = Motor()
         self.flash_delay_series = FlashDelaySeries()
-
 
         # Frames
         self.laserControlFrame = LaserFrame(

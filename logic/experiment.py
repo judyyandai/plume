@@ -1,6 +1,6 @@
 from threading import Event
 
-class Experiment():
+class Experiment:
     def __init__(self):
         """
         DESCRIPTION:

@@ -168,14 +168,20 @@ class LaserFrame(ContainerFrame):
     def change_laser_option(self):
         option = self.laser_option.get()
         self.laser.change_option(option)
-        self.update_frame()
+        self.change_laser_mode()
     
 
     def change_laser_mode(self):
         mode = self.laser_mode.get()
         self.laser.change_mode(mode)
+        if mode == "Regular Pulse":
+            if self.laser.option == "Q-Tune":
+                self.laser.change_frequency("10 Hz")
+            else:
+                self.laser.change_frequency("100 Hz")
+        else:
+            self.change_laser_pulse_spacing()
         self.update_frame()
-
     
     def change_laser_frequency(self, event):
         frequency = self.ddRegFreq.get()

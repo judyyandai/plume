@@ -1,10 +1,12 @@
 #
 from threading import Event
+
+
 import logic.devices.pyCurlModel as qTune
 
 
 class Laser():
-    def __init__(self):
+    def __init__(self, teensy):
         """
         DESCRIPTION:
 
@@ -23,10 +25,11 @@ class Laser():
         #Event to track if the laser is on or off
         self.e_laserOn = Event()
 
-        # Creating device objects  for GUI
-        
+        # teensy
+        self.teensy = teensy
+
         # Default Teensy to Regular Pulse mode
-        # self.teensy.mode(0)
+        self.teensy.mode(0)
 
 
      # !!! all functions need to be implement
@@ -44,17 +47,17 @@ class Laser():
             if self.option == "Q-Tune":
                 qTune.runLaser()
                 print("Laser on")
-            #elif self.option.get() == "PIRL": !!! deal with PIRL
+            elif self.option == "PIRL":
                 # self.T_autocorrector = Thread(target = self.autocorrector, name = "T_autocorrector", args = ([None]))
                 # self.T_autocorrector.start()
-            #    self.teensy.message("on")
+                self.teensy.message("on")
 
         elif not self.e_laserOn.is_set():
-            if self.option == "Q-Tune":
+            if self.option == "Q-Tune": 
                 qTune.stopLaser()
                 print("Laser off")
-            #elif self.option.get() == "PIRL":
-            #    self.teensy.message("off")
+            elif self.option == "PIRL":
+                self.teensy.message("off")
 
 
 
@@ -112,13 +115,13 @@ class Laser():
 
         if self.mode == "Gallop":
             if self.option == "PIRL":
-                print(self.pulse_spacing.get())
+                print(self.pulse_spacing)
                 # handle the two options within Gallop Mode
-                if self.pulse_spacing.get() == "prepulse":
-                    # self.teensy.mode(3) !!! deal with PIRL
+                if self.pulse_spacing == "prepulse":
+                    self.teensy.mode(3)
                     print("GUI set pedal to Gallop, 2ms space")
-                elif self.pulse_spacing.get() == "no prepulse":
-                    # self.teensy.mode(4)
+                elif self.pulse_spacing == "no prepulse":
+                    self.teensy.mode(4)
                     print("GUI set pedal to Gallop, 8ms space")
                 else:
                     print("GUI ERROR invalid pulse spacing chosen. See on_mode_change()")
@@ -126,22 +129,18 @@ class Laser():
                 qTune.gallopModeInternal()
                 print("Q-Tune now in Gallop Mode")
 
-        else: # Pedal 0 mode, regular pulse 
+        else: # Pedal 0 mode, regular pulse
             
             #if self.F_Experiment: #* if experiment is running, then stop it! Shouldn't be able to run experiment without Gallop  !!! is this needed?
 
             
             if self.mode == "Regular Pulse":
                 if self.option == "PIRL":
-                    # self.teensy.mode(0)
+                    self.teensy.mode(0)
                     print("GUI set to pedal 0")
                 else:
                     qTune.gallopModeOff()
-                    try:
-                        qTune.changeFrequency(10)
-                        print("Q-Tune now in Regular Pulse Mode, at 10Hz")
-                    except: 
-                        print("on_laser_change: Q-Tune is inactive.")
+                    print("Q-Tune now in Regular Pulse Mode")
             else:
                 print("GUI ERROR Invalid Mode Command entered!")
 
@@ -158,19 +157,14 @@ class Laser():
         if self.option == "PIRL":
             # if Q-Tune is on but not the chosen laser, turn it off
             qTune.stopLaser()
-            # self.teensy.message("q-tune please no") !!! fix when teensy is implemented
+            self.teensy.message("q-tune please no")
         elif self.option == "Q-Tune":
             #Switch laser mode to Regular Pulse Mode
-            self.mode="Regular Pulse"
-            #Default laser to 10 Hz
-            try:
-                qTune.changeFrequency(10)
-            except: 
-                print("on_laser_change: Q-Tune is inactive.")
+            self.teensy.message("off")
+            # self.teensy.message("q-tune please") !!! do we need this because does the teensy fire the laser?           
 
 
-
-    def on_frequency_change(self, event):
+    def on_frequency_change(self):
         """
         DESCRIPTION:
             Runs whenever a new laser frequency is chosen from the regular pulse frequency dropdown. Sends appropriate serial commands and does some error checking.
@@ -186,15 +180,14 @@ class Laser():
             qTune.changeFrequency(float(freq))
             print(f"GUI change frequency to {freq} Hz")
         # should only change detach_time if we're pedal 0 mode. 
-    # !!! fix once teensy is implemented   
-    #    elif self.teensy.getMode() == 0:
-    #        selection = self.frequency.get()
-    #        # selection is in the format "XXX.X Hz" so we need to extract that number
-    #        # .split() breaks the string at the space. 
-    #        freq, *rest = selection.split() 
-    #        detach_time = 1000*int(1000/float(freq)) - 500
-    #        print(f"GUI change detach time to {detach_time}")
-    #        self.teensy.Q23TriggerIgnoreWindow(detach_time)
+        elif self.teensy.getMode() == 0:
+            selection = self.frequency
+            # selection is in the format "XXX.X Hz" so we need to extract that number
+            # .split() breaks the string at the space. 
+            freq, *rest = selection.split() 
+            detach_time = 1000*int(1000/float(freq)) - 500
+            print(f"GUI change detach time to {detach_time}")
+            self.teensy.Q23TriggerIgnoreWindow(detach_time)
         
         
 
