@@ -143,9 +143,9 @@ class pulse_generator:
         PARAMETERS:
             flash_delay(float): Ideal time between the laser shot and the flashlamp in seconds with the smalles possible time being nanoseconds
             
-            skip_num(int): UNUSED The number of the pulse which you want to take as the cleaning pulse so if pulse_num = 4 you would skip 3 and take the 4th pulse
-            
             prepulse_mode(boolean): If prepulse_mode = True, then we're doing prepulse, if False, we're doing NO prepulse
+
+            laser (str): "Q-Tune" or "PIRL"
         RETURNS:
             None
         """

@@ -161,12 +161,27 @@ class LaserFrame(ContainerFrame):
         self.update_frame()
 
 
-    def experiment_toggle(self):
+    def experiment_toggle(self, total_measurements = 0, mode = None):
         """
         DESCRIPTION:
             Calls toggle function on experiment object, updates GUI.
         """
-        self.experiment.toggle()
+        if self.experiment.e_experimentOn.is_set():
+            self.experiment.stop()
+        else:
+            user_entered_input_values = messagebox.askyesno(
+                title = "Input Values", 
+                message = "Have you chosen an appropriate file path & entered values under 'Input Values'? These are inmportant if you want to save your files!")
+            user_closed_shutter = messagebox.askyesno(
+                title = "Shutter Reminder", 
+                message="Make sure to close the shutter before proceeding! The pulses will fire correctly only if the shutter is closed.")
+            if user_entered_input_values and user_closed_shutter:
+                print("Starting Experiment.")
+                if self.laser.mode == "Regular Pulse":
+                    messagebox.showinfo(title = 'Invalid laser mode', message = """"Please change laser to Gallop Mode before measuring.
+                                    This is the only valid laser mode for measurement.""")
+                    return
+                self.experiment.start(total_measurements, mode, option = self.laser.option)
         self.update_frame()
 
 
@@ -217,7 +232,7 @@ class LaserFrame(ContainerFrame):
         """
         pulse_spacing = self.pulse_spacing.get()
         if pulse_spacing == "prepulse":
-            self.data_manager.V_prepulse = True # !!! do we need
+            self.data_manager.V_prepulse = True 
         if pulse_spacing == "no prepulse":
             self.data_manager.V_prepulse = False
         self.laser.change_pulse_spacing(pulse_spacing)

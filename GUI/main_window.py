@@ -17,13 +17,13 @@ from GUI.frames.qTune import QTuneFrame
 from GUI.frames.motor import MotorFrame
 from GUI.frames.rs_flash_delay import RSFlashDelay
 
-from logic.laser import Laser
-from logic.PIDheater import Heater
-from logic.experiment import Experiment
-from logic.pulse_generator import PulseGenerator
-from logic.motor import Motor
-from logic.flash_delay_series import FlashDelaySeries
-from logic.data_manager import DataManager
+from logic.objects.laser import Laser
+from logic.objects.PIDheater import Heater
+from logic.objects.experiment import Experiment
+from logic.objects.pulse_generator import PulseGenerator
+from logic.objects.motor import Motor
+from logic.objects.flash_delay_series import FlashDelaySeries
+from logic.objects.data_manager import DataManager
 
 from logic.Plupy import Plupy as pl
 from logic.Plupy.pirl import pirl
@@ -79,8 +79,18 @@ class MainWindow(tk.Tk):
         
         # Create instances of objects
         self.dataManager = DataManager()
-        self.laser = Laser(self.teensy) 
-        self.experiment = Experiment() 
+        self.laser = Laser(
+            teensy=self.teensy) 
+        self.experiment = Experiment(
+            vacuum_meter=self.vacuumMeter, 
+            data_manager=self.dataManager, 
+            pg=self.pg,
+            teensy = self.teensy,
+            osc_TDS2014C = self.osc_TDS2014C,
+            osc_DPO2024B = self.osc_DPO2024B,
+            cam = self.cam,
+            uno = self.uno,
+            coherent = self.coherent) 
         self.heater = Heater()
         self.pg = PulseGenerator()
         self.motor = Motor()
