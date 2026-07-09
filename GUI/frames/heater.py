@@ -51,10 +51,18 @@ class HeatingFrame(ContainerFrame):
 
     
     def heater_toggle(self):
+        """
+        DESCRIPTION:
+            Calls toggle function on heater and updates GUI.
+        """
         self.heater.toggle()
         self.update_b_pidOnOff()
     
     def update_b_pidOnOff(self):
+        """
+        DESCRIPTION:
+            Updates the heater on/off button.
+        """
         if self.heater.e_heaterOn.is_set():
             self.b_pidOnOff.config(text = "Turn Heater OFF")
             print("Heater turned on")
@@ -66,12 +74,8 @@ class HeatingFrame(ContainerFrame):
     def set_Kp(self):
         """
         DESCRIPTION:
-            Sends the new Kp value to heater box + saves it to the Tkinter variable.
+            Sends the new Kp value to heater object + saves it to the config.json.
             Kp is the proportional constant in the PID heater system.
-        PARAMETERS
-            None.
-        RETURN: 
-            None.
         """
         self.entry_Kp.on_enter() 
         self.heater.set_coeff("Kp", self.data_manager.V_Kp.get())
@@ -79,12 +83,8 @@ class HeatingFrame(ContainerFrame):
     def set_Ki(self):
         """
         DESCRIPTION:
-            Sends the new Ki value to heater box + saves it to the Tkinter variable.
+           Sends the new Ki value to heater object + saves it to the config.json.
             Ki is the integral constant in the PID heater system.
-        PARAMETERS
-            None
-        RETURN: 
-            None.
         """
         self.entry_Ki.on_enter() 
         self.heater.set_coeff("Ki", self.data_manager.V_Ki.get())
@@ -92,15 +92,12 @@ class HeatingFrame(ContainerFrame):
     def set_Kd(self):
         """
         DESCRIPTION:
-            Sends the new Kd value to heater box + saves it to the Tkinter variable.
+            Sends the new Kd value to heater object + saves it to the config.json.
             Kd is the derivative constant in the PID heater system.
-        PARAMETERS
-            None.
-        RETURN: 
-            None.
         """
         self.entry_Kd.on_enter() 
         self.heater.set_coeff("Kd", self.data_manager.V_Kd.get())
+
 
     def set_target_temp(self, suppress_popup = False):
         """
@@ -108,8 +105,6 @@ class HeatingFrame(ContainerFrame):
             Send new target temperature to the heater. First check that it is not above the max alloweable temperature, and confirm with the user. 
         PARAMETERS
             suppress_popup: Defaults to False. If True, there will be no pop-up asking to confirm target_temp.
-        RETURN: 
-            None.
             
         """
         old_val = self.data_manager.V_target_temp_C.get()

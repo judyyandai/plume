@@ -6,6 +6,18 @@ from tkinter import messagebox
 
 class MotorFrame(ContainerFrame):
     def __init__(self, parent, data_manager, motor):
+        """
+        DESCRIPTION:
+            Class used to create the motor panel which contains:
+                - up/down/left/right buttons
+                - distance entry
+                - current possition display
+                - description about the panel
+        PARAMETERS:
+            parent - (tk.Frame) the frame this frame is placed in
+            data_manager - (dataManager) accesses and updates config.json files
+            motor - (Motor) object that handles the state of the motor
+        """
         super().__init__(parent, "Motor Control Panel")
         
         self.container = parent
@@ -58,10 +70,6 @@ class MotorFrame(ContainerFrame):
         """
         DESCRIPTION:
             Retrieves the motor step distance value from the entry box, and saves it.   
-        PARAMETERS:
-            None.
-        RETURN: 
-            None.
         """
         self.entry_MotorStepDistance.on_enter()
 
@@ -74,8 +82,7 @@ class MotorFrame(ContainerFrame):
         PARAMETERS
             sign: integer must be -1 for negative directions (left & down) or +1 for positive directions (right & up)
             direction: string. "x" or "y" are valid.
-        RETURN: 
-            None.
+
         """
         try:
             dist = self.data_manager.V_MotorStepDistance.get()
@@ -139,10 +146,7 @@ class MotorFrame(ContainerFrame):
         """
         DESCRIPTION:
             Move the motor towards the camera by a predefined amount.
-        PARAMETERS:
-            None.
-        RETURN: 
-            None.
+
         """
         self.move_motor_with_limits(1, 'y')
 
@@ -150,10 +154,6 @@ class MotorFrame(ContainerFrame):
         """
         DESCRIPTION:
             Moves the motor towards the flash lamp by a predefined amount.
-        PARAMETERS:
-            None.
-        RETURN: 
-            None.
         """
         self.move_motor_with_limits(-1, 'y')
     
@@ -161,10 +161,6 @@ class MotorFrame(ContainerFrame):
         """
         DESCRIPTION:
             Moves the motor away from the room with the Electron Microscope (DEM) by a predefined amount.
-        PARAMETERS:
-            None.
-        RETURN: 
-            None.
         """
         self.move_motor_with_limits(-1, 'x')
         
@@ -173,10 +169,6 @@ class MotorFrame(ContainerFrame):
         """
         DESCRIPTION:
             Moves the motor towards the room with the Electron Microscope (DEM) by a predefined amount.
-            PARAMETERS:
-            None.
-        RETURN: 
-            None.
         """
         self.move_motor_with_limits(1, 'x')       
         
@@ -184,14 +176,12 @@ class MotorFrame(ContainerFrame):
     def create_button(self, frame, label_text, position, command):
         """
         DESCRIPTION:
-            Function to create buttom widgets.
+            Function to create custom button widgets.
         PARAMETERS:
             frame: The frame to pack the widget into
             label_text: The text for the label
             posiion: list with 2 elements to indicate the grid position on the frame
             command: function associated with the button
-        RETURN:
-            None.
         """
         # Creating frame
         button_frame = tk.Frame(frame)
@@ -208,8 +198,6 @@ class MotorFrame(ContainerFrame):
             creates and places the little pictures that are displayed by the motor driver movement, to help the user navigate
         PARAMETERS:
             Motor_frame: frame where the rest of the motor movement buttons are
-        RETURN:
-            None.
         """
         self.motor_canvas_top = tk.Canvas(Motor_frame, width=40, height=30)
         self.motor_canvas_top.grid(row=0, column=1, padx=1, pady=1)

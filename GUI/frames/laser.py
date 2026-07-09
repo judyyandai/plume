@@ -153,11 +153,19 @@ class LaserFrame(ContainerFrame):
     # Methods for toggling objects
 
     def laser_toggle(self):
+        """
+        DESCRIPTION:
+            Calls toggle function on laser object, updates GUI.
+        """
         self.laser.toggle()
         self.update_frame()
 
 
     def experiment_toggle(self):
+        """
+        DESCRIPTION:
+            Calls toggle function on experiment object, updates GUI.
+        """
         self.experiment.toggle()
         self.update_frame()
 
@@ -166,32 +174,50 @@ class LaserFrame(ContainerFrame):
     # Methods for calling change on the laser object and update GUI elements in response to the change
 
     def change_laser_option(self):
+        """
+        DESCRIPTION:
+            Calls change_option on the laser object. Updates the laser mode.
+        """
         option = self.laser_option.get()
         self.laser.change_option(option)
         self.change_laser_mode()
     
 
     def change_laser_mode(self):
+        """
+        DESCRIPTION:
+            Calls change_mode on the laser object, updates GUI. 
+            For regular pulse resets frequency to 10Hz / 100Hz for Q-Tune/pIRL, updates pulse spacing for Gallop.
+        """
         mode = self.laser_mode.get()
         self.laser.change_mode(mode)
-        if mode == "Regular Pulse":
+        if self.laser_mode.get() == "Regular Pulse":
             if self.laser.option == "Q-Tune":
                 self.laser.change_frequency("10 Hz")
             else:
                 self.laser.change_frequency("100 Hz")
-        else:
+        elif self.laser.option == "PIRL":
             self.change_laser_pulse_spacing()
         self.update_frame()
     
+
     def change_laser_frequency(self, event):
+        """
+        DESCRIPTION:
+            Calls change_frequency on the laser object
+        """
         frequency = self.ddRegFreq.get()
         self.laser.change_frequency(frequency)       
 
 
     def change_laser_pulse_spacing(self):
+        """
+        DESCRIPTION:
+            Updates prepulse boolean in config.json and calls change_pulse_spacing on the laser object.
+        """
         pulse_spacing = self.pulse_spacing.get()
         if pulse_spacing == "prepulse":
-            self.data_manager.V_prepulse = True
+            self.data_manager.V_prepulse = True # !!! do we need
         if pulse_spacing == "no prepulse":
             self.data_manager.V_prepulse = False
         self.laser.change_pulse_spacing(pulse_spacing)
@@ -225,7 +251,7 @@ class LaserFrame(ContainerFrame):
     def update_pulse_frame(self):
         """
         DESCRIPTION:
-            Updates the Pulse frame (prepulse options, etc)
+            Updates the Pulse frame (prepulse options, frequency dropdown)
         """
         self.update_ddRegFreq()
         if self.laser.mode == "Regular Pulse":
@@ -324,26 +350,46 @@ class LaserFrame(ContainerFrame):
     # Helper methods for disabling/enabling panels
 
     def disable_laser_option(self):
+        """
+        DESCRIPTION:
+            Disables pIRL/Q-Tune radiobuttons.
+        """
         self.rb_QTune.config(state="disabled")
         self.rb_PIRL.config(state="disabled")
 
 
     def enable_laser_option(self):
+        """
+        DESCRIPTION:
+            Enables pIRL/Q-Tune radiobuttons.
+        """
         self.rb_QTune.config(state="normal")
         self.rb_PIRL.config(state="normal")
 
     
     def disable_pulse_spacing(self):
+        """
+        DESCRIPTION:
+            Disables prepulse/no prepulse radiobuttons.
+        """
         self.rb_noprepulse.config(state="disabled")
         self.rb_prepulse.config(state="disabled")
 
     
     def enable_pulse_spacing(self):
+        """
+        DESCRIPTION:
+            Enables prepulse/no prepulse radiobuttons.
+        """
         self.rb_noprepulse.config(state="normal")
         self.rb_prepulse.config(state="normal")
 
 
     def disable_laser_mode(self):
+        """
+        DESCRIPTION:
+            Disables regular pulse/gallop, prepulse/no prepulse, and frequency dropdown.
+        """
         self.rb_regPulse.config(state="disabled")
         self.rb_gallop.config(state="disabled")
         self.disable_pulse_spacing()
@@ -351,6 +397,10 @@ class LaserFrame(ContainerFrame):
 
 
     def enable_laser_mode(self):
+        """
+        DESCRIPTION:
+            Enables regular pulse/gallop, prepulse/no prepulse, and frequency dropdown.
+        """
         self.rb_regPulse.config(state="normal")
         self.rb_gallop.config(state="normal")
         self.enable_pulse_spacing()

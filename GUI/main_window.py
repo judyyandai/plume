@@ -162,10 +162,6 @@ class MainWindow(tk.Tk):
         """
         DESCRIPTION:
             Custom close function to ensure safe closing of the GUI software: Attempts to terminate all threads. Turns off laser. Turns off heater module.
-        PARAMETERS
-            None.
-        RETURN: 
-            None.
         """
        
         if messagebox.askokcancel("Quit", "Do you want to quit?"):

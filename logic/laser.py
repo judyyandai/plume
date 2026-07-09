@@ -9,14 +9,18 @@ class Laser():
     def __init__(self, teensy):
         """
         DESCRIPTION:
-
+            Handles the state of the laser including:
+            - option: one of "PIRL" or "Q-Tune"
+            - mode: one of "Regular Pulse" or "Gallop
+            - frequency: in Hz
+            - pulse_spacing: one of "prepulse" or "no prepulse"
         PARAMETERS:
-
+            teensy - Plupy teensy object
         """
         # Initialize the controller with PIRL laser selected, Regular Pulse, 100 Hz frequency
         self.option = "PIRL"
         self.mode = "Regular Pulse"
-        self.frequency = 100 #Hz
+        self.frequency = 100 
         self.pulse_spacing = "prepulse" #only relevant for PIRL (prepulse 2ms, no prepulse 8ms)
 
         # Default Q-Tune laser to internal triggering to confirm ethernet connection with Q-Tune is open
@@ -37,10 +41,6 @@ class Laser():
         """
         DESCRIPTION:
             Switches the laser on or off depending on its current state.
-        PARAMETERS
-            None.
-        RETURN 
-            None.
         """
         self.e_laserOn.set() if not self.e_laserOn.is_set() else self.e_laserOn.clear()
         if self.e_laserOn.is_set():
@@ -100,17 +100,24 @@ class Laser():
             Changes to selected prepulse to ablation pulse spacing (only relevant in gallop mode with pirl)
         """
         self.pulse_spacing = pulse_spacing
+        self.on_pulse_spacing_change()
+
+
+    def on_pulse_spacing_change(self):
+        if self.pulse_spacing == "prepulse":
+            self.teensy.mode(3)
+            print("GUI set pulse spacing, 2ms space")
+        elif self.pulse_spacing == "no prepulse":
+            self.teensy.mode(4)
+            print("GUI set pulse spacing, 8ms space")
+        else:
+            print("GUI ERROR invalid pulse spacing chosen. See on_pulse_spacing_change()")
 
 
     def on_mode_change(self):
         """
         DESCRIPTION:
-            Configures neccesary changes in qTune and teensy according to laser mode selected: regular pulse or gallop. And prepulse or no prepulse.
-        PARAMETERS
-            None.
-        RETURN: 
-            None.
-            
+            Configures neccesary changes in qTune and teensy according to laser mode selected: regular pulse or gallop. And prepulse or no prepulse.        
         """
 
         if self.mode == "Gallop":
@@ -149,18 +156,14 @@ class Laser():
         """
         DESCRIPTION:
             Switches off non-corresponding laser if running
-        PARAMETERS
-            None.
-        RETURN 
-            None.
         """
         if self.option == "PIRL":
             # if Q-Tune is on but not the chosen laser, turn it off
-            qTune.stopLaser()
+            qTune.stopLaser() #!!! do we need this? because we can't change the laser anyways when it is on
             self.teensy.message("q-tune please no")
         elif self.option == "Q-Tune":
             #Switch laser mode to Regular Pulse Mode
-            self.teensy.message("off")
+            self.teensy.message("off") #!!! do we need this? because we can't change the laser anyways when it is on
             # self.teensy.message("q-tune please") !!! do we need this because does the teensy fire the laser?           
 
 
@@ -168,10 +171,6 @@ class Laser():
         """
         DESCRIPTION:
             Runs whenever a new laser frequency is chosen from the regular pulse frequency dropdown. Sends appropriate serial commands and does some error checking.
-        PARAMETERS:
-            None            
-        RETURN: 
-            None
         """
         # do Q-Tune frequency changes if laser is set at Q-Tune        
         if self.option == "Q-Tune":
@@ -193,8 +192,16 @@ class Laser():
 
     
     def change_qTune_wavelength(self, wavelength):
+        """
+        DESCRIPTION:
+            Changes the wavelength of the Q-Tune via pycurl.
+        """
         qTune.changeWavelength(wavelength)
     
 
     def change_qTune_pump(self, pump):
+        """
+        DESCRIPTION:
+            Changes the pump level of the Q-Tune via pycurl.
+        """
         qTune.changePumpLevel(pump)

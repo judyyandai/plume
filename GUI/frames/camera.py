@@ -7,6 +7,14 @@ from GUI.widgets.tool_tip import ToolTip
 
 class CameraFrame(ContainerFrame):
     def __init__(self, parent, data_manager):
+        """
+        DESCRIPTION:
+            Class used to create the camera panel which contains:
+                - camera gain entry
+        PARAMETERS:
+            parent - (tk.Frame) the frame this frame is placed in
+            data_manager - (dataManager) accesses and updates config.json files
+        """
         super().__init__(parent, "Thor Labs Camera")
 
         self.data_manager = data_manager

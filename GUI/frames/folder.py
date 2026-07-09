@@ -6,6 +6,15 @@ from GUI.widgets.tool_tip import ToolTip
 
 class FolderFrame(tk.Frame):
     def __init__(self, parent, data_manager):
+        """
+        DESCRIPTION:
+            Class used to create the folder panel which contains:
+                - folder entry
+                - lens focal length and height entry
+        PARAMETERS:
+            parent - (tk.Frame) the frame this frame is placed in
+            data_manager - (dataManager) accesses and updates config.json files
+        """
         super().__init__(parent)
 
         self.data_manager = data_manager
@@ -45,10 +54,6 @@ class FolderFrame(tk.Frame):
         """
         DESCRIPTION:
             Sets new focal length
-        PARAMETERS
-            None.
-        RETURN: 
-            None.
         """
         self.entry_focal_length.on_enter()
         print(f"Lens focal length set to {self.data_manager.V_lens}mm")
@@ -57,10 +62,6 @@ class FolderFrame(tk.Frame):
         """
         DESCRIPTION:
             Sets new focal length
-        PARAMETERS
-            None.
-        RETURN: 
-            None.
         """
         self.entry_lens_height.on_enter()
         print(f"Lens height set to {self.data_manager.V_lens_height}mm")

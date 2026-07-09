@@ -1,37 +1,37 @@
-2026-07-08 17:30:15,960 - DEBUG - No visa library specified, trying to find alternatives.
-2026-07-08 17:30:15,960 - DEBUG - Environment variable PYVISA_LIBRARY is unset.
-2026-07-08 17:30:15,969 - DEBUG - No user defined configuration
-2026-07-08 17:30:15,973 - DEBUG - Automatically found library files: [None, 'C:\\Windows\\system32\\visa32.dll', 'C:\\Windows\\system32\\visa32.dll', 'C:\\Windows\\system32\\visa64.dll', 'C:\\Windows\\system32\\visa64.dll']
-2026-07-08 17:30:15,974 - DEBUG - No user defined library files
-2026-07-08 17:30:15,975 - DEBUG - The IVI implementation available
-2026-07-08 17:30:15,976 - DEBUG - No user defined configuration
-2026-07-08 17:30:15,981 - DEBUG - Automatically found library files: [None, 'C:\\Windows\\system32\\visa32.dll', 'C:\\Windows\\system32\\visa32.dll', 'C:\\Windows\\system32\\visa64.dll', 'C:\\Windows\\system32\\visa64.dll']
-2026-07-08 17:30:15,981 - DEBUG - No user defined library files
-2026-07-08 17:30:15,986 - DEBUG - Library signatures: 90 ok, 0 failed
-2026-07-08 17:30:15,986 - DEBUG - Created library wrapper for C:\Windows\system32\visa32.dll
-2026-07-08 17:30:16,091 - DEBUG - viOpenDefaultRM('<ViObject object at 0x000001D77FEB4850>',) -> 0
-2026-07-08 17:30:16,091 - DEBUG - Created ResourceManager with session 1
-2026-07-08 17:30:17,576 - DEBUG - viParseRsrcEx(1, 'USB::0x0699::0x03A4::C015987::INSTR', 'c_ushort(7)', 'c_ushort(0)', <ctypes.c_char_Array_256 object at 0x000001D77FF154D0>, <ctypes.c_char_Array_256 object at 0x000001D77FF15550>, <ctypes.c_char_Array_256 object at 0x000001D77FF155D0>) -> 0
-2026-07-08 17:30:17,577 - DEBUG - USB0::0x0699::0x03A4::C015987::0::INSTR - opening ...
-2026-07-08 17:30:17,589 - DEBUG - viOpen(1, 'USB0::0x0699::0x03A4::C015987::0::INSTR', <AccessModes.no_lock: 0>, 0, '<ViObject object at 0x000001D77FF153D0>') -> 0
-2026-07-08 17:30:17,589 - DEBUG - USB0::0x0699::0x03A4::C015987::0::INSTR - is open with session 2
-2026-07-08 17:30:17,590 - DEBUG - viSetAttribute(2, 1073676310, <VisaBoolean.true: 1>) -> 0
-2026-07-08 17:30:17,591 - DEBUG - viSetAttribute(2, 1073676314, 5000) -> 0
-2026-07-08 17:30:17,594 - DEBUG - viParseRsrcEx(1, 'USB::0x0699::0x03A3::C031362::INSTR', 'c_ushort(7)', 'c_ushort(0)', <ctypes.c_char_Array_256 object at 0x000001D77FF15C50>, <ctypes.c_char_Array_256 object at 0x000001D77FF15CD0>, <ctypes.c_char_Array_256 object at 0x000001D77FF15D50>) -> 0
-2026-07-08 17:30:17,595 - DEBUG - USB0::0x0699::0x03A3::C031362::0::INSTR - opening ...
-2026-07-08 17:30:17,606 - DEBUG - viOpen(1, 'USB0::0x0699::0x03A3::C031362::0::INSTR', <AccessModes.no_lock: 0>, 0, '<ViObject object at 0x000001D77FF15B50>') -> 0
-2026-07-08 17:30:17,607 - DEBUG - USB0::0x0699::0x03A3::C031362::0::INSTR - is open with session 3
-2026-07-08 17:30:17,607 - DEBUG - viSetAttribute(3, 1073676310, <VisaBoolean.true: 1>) -> 0
-2026-07-08 17:30:17,608 - DEBUG - viSetAttribute(3, 1073676314, 5000) -> 0
-2026-07-08 17:32:22,930 - DEBUG - Closing ResourceManager (session: 1)
-2026-07-08 17:32:22,931 - DEBUG - USB0::0x0699::0x03A3::C031362::0::INSTR - closing
-2026-07-08 17:32:22,932 - DEBUG - viDisableEvent(3, <EventType.all_enabled: 1073709055>, <EventMechanism.all: 65535>) -> 1073676291
-2026-07-08 17:32:22,933 - DEBUG - viDiscardEvents(3, <EventType.all_enabled: 1073709055>, <EventMechanism.all: 65535>) -> 1073676292
-2026-07-08 17:32:22,934 - DEBUG - viClose(3,) -> 0
-2026-07-08 17:32:22,936 - DEBUG - USB0::0x0699::0x03A3::C031362::0::INSTR - is closed
-2026-07-08 17:32:22,938 - DEBUG - USB0::0x0699::0x03A4::C015987::0::INSTR - closing
-2026-07-08 17:32:22,940 - DEBUG - viDisableEvent(2, <EventType.all_enabled: 1073709055>, <EventMechanism.all: 65535>) -> 1073676291
-2026-07-08 17:32:22,942 - DEBUG - viDiscardEvents(2, <EventType.all_enabled: 1073709055>, <EventMechanism.all: 65535>) -> 1073676292
-2026-07-08 17:32:22,943 - DEBUG - viClose(2,) -> 0
-2026-07-08 17:32:22,943 - DEBUG - USB0::0x0699::0x03A4::C015987::0::INSTR - is closed
-2026-07-08 17:32:22,946 - DEBUG - viClose(1,) -> 0
+2026-07-09 11:36:09,677 - DEBUG - No visa library specified, trying to find alternatives.
+2026-07-09 11:36:09,677 - DEBUG - Environment variable PYVISA_LIBRARY is unset.
+2026-07-09 11:36:09,687 - DEBUG - No user defined configuration
+2026-07-09 11:36:09,691 - DEBUG - Automatically found library files: [None, 'C:\\Windows\\system32\\visa32.dll', 'C:\\Windows\\system32\\visa32.dll', 'C:\\Windows\\system32\\visa64.dll', 'C:\\Windows\\system32\\visa64.dll']
+2026-07-09 11:36:09,692 - DEBUG - No user defined library files
+2026-07-09 11:36:09,693 - DEBUG - The IVI implementation available
+2026-07-09 11:36:09,693 - DEBUG - No user defined configuration
+2026-07-09 11:36:09,698 - DEBUG - Automatically found library files: [None, 'C:\\Windows\\system32\\visa32.dll', 'C:\\Windows\\system32\\visa32.dll', 'C:\\Windows\\system32\\visa64.dll', 'C:\\Windows\\system32\\visa64.dll']
+2026-07-09 11:36:09,699 - DEBUG - No user defined library files
+2026-07-09 11:36:09,704 - DEBUG - Library signatures: 90 ok, 0 failed
+2026-07-09 11:36:09,704 - DEBUG - Created library wrapper for C:\Windows\system32\visa32.dll
+2026-07-09 11:36:09,803 - DEBUG - viOpenDefaultRM('<ViObject object at 0x0000027170118D50>',) -> 0
+2026-07-09 11:36:09,804 - DEBUG - Created ResourceManager with session 1
+2026-07-09 11:36:11,285 - DEBUG - viParseRsrcEx(1, 'USB::0x0699::0x03A4::C015987::INSTR', 'c_ushort(7)', 'c_ushort(0)', <ctypes.c_char_Array_256 object at 0x000002717016D9D0>, <ctypes.c_char_Array_256 object at 0x000002717016DA50>, <ctypes.c_char_Array_256 object at 0x000002717016DAD0>) -> 0
+2026-07-09 11:36:11,288 - DEBUG - USB0::0x0699::0x03A4::C015987::0::INSTR - opening ...
+2026-07-09 11:36:11,310 - DEBUG - viOpen(1, 'USB0::0x0699::0x03A4::C015987::0::INSTR', <AccessModes.no_lock: 0>, 0, '<ViObject object at 0x000002717016D8D0>') -> 0
+2026-07-09 11:36:11,310 - DEBUG - USB0::0x0699::0x03A4::C015987::0::INSTR - is open with session 2
+2026-07-09 11:36:11,314 - DEBUG - viSetAttribute(2, 1073676310, <VisaBoolean.true: 1>) -> 0
+2026-07-09 11:36:11,316 - DEBUG - viSetAttribute(2, 1073676314, 5000) -> 0
+2026-07-09 11:36:11,318 - DEBUG - viParseRsrcEx(1, 'USB::0x0699::0x03A3::C031362::INSTR', 'c_ushort(7)', 'c_ushort(0)', <ctypes.c_char_Array_256 object at 0x000002717016E150>, <ctypes.c_char_Array_256 object at 0x000002717016E1D0>, <ctypes.c_char_Array_256 object at 0x000002717016E250>) -> 0
+2026-07-09 11:36:11,318 - DEBUG - USB0::0x0699::0x03A3::C031362::0::INSTR - opening ...
+2026-07-09 11:36:11,326 - DEBUG - viOpen(1, 'USB0::0x0699::0x03A3::C031362::0::INSTR', <AccessModes.no_lock: 0>, 0, '<ViObject object at 0x000002717016E050>') -> 0
+2026-07-09 11:36:11,328 - DEBUG - USB0::0x0699::0x03A3::C031362::0::INSTR - is open with session 3
+2026-07-09 11:36:11,328 - DEBUG - viSetAttribute(3, 1073676310, <VisaBoolean.true: 1>) -> 0
+2026-07-09 11:36:11,329 - DEBUG - viSetAttribute(3, 1073676314, 5000) -> 0
+2026-07-09 11:44:18,829 - DEBUG - Closing ResourceManager (session: 1)
+2026-07-09 11:44:18,830 - DEBUG - USB0::0x0699::0x03A3::C031362::0::INSTR - closing
+2026-07-09 11:44:18,831 - DEBUG - viDisableEvent(3, <EventType.all_enabled: 1073709055>, <EventMechanism.all: 65535>) -> 1073676291
+2026-07-09 11:44:18,833 - DEBUG - viDiscardEvents(3, <EventType.all_enabled: 1073709055>, <EventMechanism.all: 65535>) -> 1073676292
+2026-07-09 11:44:18,835 - DEBUG - viClose(3,) -> 0
+2026-07-09 11:44:18,837 - DEBUG - USB0::0x0699::0x03A3::C031362::0::INSTR - is closed
+2026-07-09 11:44:18,839 - DEBUG - USB0::0x0699::0x03A4::C015987::0::INSTR - closing
+2026-07-09 11:44:18,840 - DEBUG - viDisableEvent(2, <EventType.all_enabled: 1073709055>, <EventMechanism.all: 65535>) -> 1073676291
+2026-07-09 11:44:18,841 - DEBUG - viDiscardEvents(2, <EventType.all_enabled: 1073709055>, <EventMechanism.all: 65535>) -> 1073676292
+2026-07-09 11:44:18,841 - DEBUG - viClose(2,) -> 0
+2026-07-09 11:44:18,842 - DEBUG - USB0::0x0699::0x03A4::C015987::0::INSTR - is closed
+2026-07-09 11:44:18,845 - DEBUG - viClose(1,) -> 0

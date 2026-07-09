@@ -3,6 +3,15 @@ from GUI.widgets.entry_box import EntryBox
 
 class QTuneFrame(ContainerFrame):
     def __init__(self, parent, data_manager, laser):
+        """
+        DESCRIPTION:
+            Class used to create the Q-Tune panel which contains:
+                - wavelength and pump energy level entries
+        PARAMETERS:
+            parent - (tk.Frame) the frame this frame is placed in
+            data_manager - (dataManager) accesses and updates config.json files
+            laser - (Laser) handles the state of the laser
+        """
         super().__init__(parent, 'Q-Tune')
         self.parent = parent
         self.data_manager = data_manager
@@ -16,11 +25,8 @@ class QTuneFrame(ContainerFrame):
     def set_qTune_wavelength(self):
         """
         DESCRIPTION:
-            Retrieve the qtune wavelength from the entry box, and then change the wavelength via pycurl.
-        PARAMETERS:
-            None
-        RETURN:
-            None
+            Updates the qtune wavelength from the entry box, and calls the change on the laser object.
+
         """
         self.entry_qTune_wavelength.on_enter()
         qTune_wavelength = self.data_manager.V_qTune_wavelength.get()
@@ -30,11 +36,8 @@ class QTuneFrame(ContainerFrame):
     def set_qTune_pump(self):
         """
         DESCRIPTION:
-            Retrieve the OPO Pump Energy Level from the entry box, and then change the pump level via pycurl.
-        PARAMETERS:
-            None
-        RETURN:
-            None
+            Updates the OPO Pump Energy Level from the entry box, and calls the change on the laser object.
+
         """
         
         self.entry_qTune_pump.on_enter()

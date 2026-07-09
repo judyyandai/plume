@@ -5,6 +5,16 @@ from GUI.widgets.tool_tip import ToolTip
 
 class PulseGeneratorFrame(ContainerFrame):
     def __init__(self, parent, data_manager, pg):
+        """
+        DESCRIPTION:
+            Class used to create the pulse generator panel which contains:
+                - flash delay and delay between triggers entry
+                - autocorrect option
+        PARAMETERS:
+            parent - (tk.Frame) the frame this frame is placed in
+            data_manager - (dataManager) accesses and updates config.json files
+            pg - (Pulse Generator) object that handles the state of the pulse generator
+        """
         super().__init__(parent, "Pulse Generator Control")
         
         self.container = parent
@@ -23,12 +33,20 @@ class PulseGeneratorFrame(ContainerFrame):
 
 
     def pg_setup(self):
+        """
+        DESCRIPTION:
+            Enter the flash delay into config.json, turn the pulse generator on.
+        """
         self.entry_FlashDelay.on_enter()
         self.pg.toggle()
 
     def set_DelayBetweenTriggers(self):
+        """
+        DESCRIPTION:
+            Enter the delay between triggers into config.json, and send it to the teensy.
+        """
         self.entry_DelayBetweenTriggers.on_enter()
-        #DelayBetweenTriggers = self.data_manager.V_DelayBetweenTriggers.get()      !!! go to pg file in logic before teensy
+        #DelayBetweenTriggers = self.data_manager.V_DelayBetweenTriggers.get()      #!!! go to pg file in logic before teensy
         #self.teensy.delayBetweenTriggers(DelayBetweenTriggers)
 
 
