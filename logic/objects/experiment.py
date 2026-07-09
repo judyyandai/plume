@@ -2,6 +2,8 @@ from threading import Event, Thread, Lock
 import threading
 import time
 import numpy as np
+from PIL import Image
+from logic.Plupy.image import image
 
 class Experiment:
     def __init__(self, vacuum_meter, data_manager, pg, teensy, osc_TDS2014C, osc_DPO2024B, cam, uno, coherent):
@@ -115,6 +117,7 @@ class Experiment:
                 true_delay = self.get_pirl_timestamp(self.data_tdc, self.flash_delay_s)
                 flash_voltage = self.osc_TDS2014C.get_value(2) # flash lamp voltage from oscilloscope
                 pulse_voltage = self.osc_TDS2014C.get_value(3) # pirl split beam voltage from oscilloscope
+                print(f"Plume lifetime: {true_delay} ns")
                 pulse_energy = 0
                 try:
                     pulse_energy = self.coherent.readValues()
@@ -159,7 +162,7 @@ class Experiment:
             current_prepulse_mode: Boolean whether we are in prepulse mode or not
         """
         exposure = 27
-        flashdelay_s = self.V_FlashDelay_us.get() *10**(-6) # reading and converting to seconds
+        flashdelay_s = self.dataManager.V_FlashDelay_us.get() *10**(-6) # reading and converting to seconds
         current_prepulse_mode = self.dataManager.V_PrePulse.get() 
         self.pg.setup(flashdelay_s, current_prepulse_mode, exposure, option)
 
@@ -182,3 +185,111 @@ class Experiment:
         self.cam.arm_camera()
         print("flash_camera_power_setup() complete.")
         return current_prepulse_mode
+    
+
+    def sort_tdc(self, tdc_counts, tdc_channels):
+        """
+        DESCRIPTION:
+            Sort the TDC timestamp data into a single dictionary with all the timestamps organized by channel. 
+        PARAMETERS
+            tdc_counts: lists of integers. Each represents time in nanoseconds since the start of TDC recording when an electrical signal was received.
+            tdc_channels: list of channel numbers. Each timestamp in tdc_counts belongs to the channel corresponding to the index in tdc_channels.
+        RETURN: 
+            result: dictionary in the format {"flash PD":[], "PIRL PD":[]}, where the lists are filled with the timestamps in nanoseconds
+            
+        """
+        result = {"flash PD": [], "teensy": [], "PIRL PD": [], "TTL Out": []} #r read and soft 
+        for i in range(len(tdc_counts)):
+            if tdc_channels[i] == ["CH4"]:
+                result["flash PD"].append(tdc_counts[i])
+                
+            if tdc_channels[i] == ["CH3"]:
+                result["teensy"].append(tdc_counts[i])
+        
+            if tdc_channels[i] == ["CH1"]:
+                result["PIRL PD"].append(tdc_counts[i])
+        
+            if tdc_channels[i] == ["CH2"]:
+                result["TTL Out"].append(tdc_counts[i])
+        print(result)
+        return result
+    
+
+    def camera_control(self, local_image):
+        """
+        DESCRIPTION:
+            Attempts to retrieve the image buffer from the camera within a finite timeout. 
+            If a buffer is available, it is copied onto the 2d array created in the 
+            experimental thread. The image is then displayed on the GUI.
+        PARAMETERS:
+            local_image: the 2d array created in the experimental thread.
+        RETURN:
+            nONE
+        """
+        image = None   
+        running_time = 0
+        print("camera control start")
+        # Attempt to retrieve image buffer within a finite timeout
+        # Return when fail
+        while image is None:
+            image = self.cam.get_image("image", save = False) 
+            time.sleep(0.05)
+            running_time = running_time + 0.05
+            if running_time >= 2:
+                print("Could not retrieve image, camera_control returning None")
+                return
+        
+        if image is not None:
+            print("There's an image to display")
+            print(image)
+            image = np.rot90(image)
+            
+            # Note that these modification are made to the image displayed
+            # on the GUI, not to the raw image
+            # C_img = image() #!!! once image stuff is implemented
+            # image_scale = C_img.add_scale_bar(image, 4095)
+            # image_norm = (image_scale / 16).astype(np.uint8)
+            # image_resized = self.resize_image(Image.fromarray(image_norm), self.image_label.winfo_width(), self.image_label.winfo_height())
+            # img = image_resized
+            
+            # Copying raw image buffer onto the 2D array local to experimental thread
+            local_image[:] = image
+
+            # Displaying the modified image
+            #self.photo = ImageTk.PhotoImage(img)
+            #self.window.after(0, lambda: self.image_label.configure(image = self.photo)) #!!! do this in GUI
+            
+            #update class variable right after displaying the image
+            self.currImage = image
+            
+            return
+        
+
+    def resize_image(self, image, max_width, max_height):
+        """
+        DESCRIPTION:
+            Function to resize image. Depending on the proportion of the width and height of the original image 
+            and maximum height&width of the original image, the resized image could be constrain by width or height
+        PARAMETERS:
+            image: image to be resized
+            max_width: Max width of resized image
+            max_height: Max height of resized image
+        RETURN:
+            Resized image. 
+        """
+        image_ratio = image.width / image.height
+        frame_ratio = max_width / max_height
+
+        if frame_ratio > image_ratio:
+            # Constrain by height
+            new_height = max_height
+            new_width = int(new_height * image_ratio)
+        else:
+            # Constrain by width
+            new_width = max_width
+            new_height = int(new_width / image_ratio)
+
+        return image.resize((new_width, new_height), Image.LANCZOS)
+
+
+        

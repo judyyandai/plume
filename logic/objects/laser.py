@@ -164,7 +164,7 @@ class Laser():
         elif self.option == "Q-Tune":
             #Switch laser mode to Regular Pulse Mode
             self.teensy.message("off") #!!! do we need this? because we can't change the laser anyways when it is on
-            # self.teensy.message("q-tune please") !!! do we need this because does the teensy fire the laser?           
+            self.teensy.message("q-tune please")            
 
 
     def on_frequency_change(self):
