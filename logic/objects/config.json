@@ -1,6 +1,6 @@
 {
     "save": false,
-    "flash delay": 1.0,
+    "flash delay": 2.0,
     "delay between triggers": 185.0,
     "prepulse": true,
     "camera gain": 20.0,

@@ -7,7 +7,7 @@ from logic.Plupy.image import image
 import logic.devices.pyCurlModel as qTune
 
 class Experiment:
-    def __init__(self, vacuum_meter, data_manager, pg, teensy, osc_TDS2014C, osc_DPO2024B, cam, uno, coherent):
+    def __init__(self, vacuum_meter, data_manager, pg, teensy, osc_TDS2014C, osc_DPO2024B, cam, uno, coherent, image_frame):
         """
         DESCRIPTION:
 
@@ -28,6 +28,7 @@ class Experiment:
         self.cam = cam
         self.uno = uno
         self.coherent = coherent
+        self.imageFrame = image_frame
 
 
 
@@ -121,21 +122,26 @@ class Experiment:
                 true_delay = self.get_pirl_timestamp(self.data_tdc)
                 flash_voltage = self.osc_TDS2014C.get_value(2) # flash lamp voltage from oscilloscope
                 pulse_voltage = self.osc_TDS2014C.get_value(3) # pirl split beam voltage from oscilloscope
-                print(f"Plume lifetime: {true_delay} ns")
                 pulse_energy = 0
                 try:
                     pulse_energy = self.coherent.readValues()
                 except:
                     print("Experiment: Couldn't find Pulse Energy! Proceeding anyway.")
 
-                with self.visa_lock:
-                    firing_delay = float(self.osc_DPO2024B.get_value(2)) * 1e6
+                #with self.visa_lock:
+                 #   firing_delay = float(self.osc_DPO2024B.get_value(2)) * 1e6
 
+                self.imageFrame.update_text(
+                    true_delay = true_delay, 
+                    flash_voltage = flash_voltage, 
+                    pulse_voltage = pulse_voltage,
+                    pulse_energy = pulse_energy)
+                
 
                 # !!! displaying images and values
             else: # Invald data
                 self.E_valid.clear()
-                # self.window.after(0, lambda: self.time_label.configure(text = "INVALID")) #!!! get this in the GUI
+                self.imageFrame.update_text_invalid()
                 time.sleep(0.4)
 
             #stop pulse generator

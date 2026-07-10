@@ -7,6 +7,7 @@ import time
 import serial
 
 from GUI.frames.laser import LaserFrame
+from GUI.frames.image import ImageFrame
 from GUI.frames.heater import HeatingFrame
 from GUI.frames.pulse_generator import PulseGeneratorFrame
 from GUI.frames.file import FileFrame
@@ -77,6 +78,12 @@ class MainWindow(tk.Tk):
         self.cam = thor_camera()
         self.coherent = Coherent(COM_ports["Coherent"], 19200, serial.EIGHTBITS, serial.PARITY_NONE,  serial.STOPBITS_ONE, self.coherent_con)
         
+
+
+        self.imageFrame = ImageFrame(
+            parent = self.Experiment_Frame)
+        
+        
         # Create instances of objects
         self.dataManager = DataManager()
         self.laser = Laser(
@@ -90,7 +97,9 @@ class MainWindow(tk.Tk):
             osc_DPO2024B = self.osc_DPO2024B,
             cam = self.cam,
             uno = self.uno,
-            coherent = self.coherent) 
+            coherent = self.coherent,
+            image_frame=self.imageFrame) 
+        
         self.heater = Heater()
         self.pg = PulseGenerator()
         self.motor = Motor()
@@ -102,6 +111,7 @@ class MainWindow(tk.Tk):
             laser=self.laser, 
             experiment=self.experiment,
             data_manager = self.dataManager)
+        
 
 
         # Create a canvas for scrollable content

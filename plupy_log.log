@@ -1,37 +1,73 @@
-2026-07-09 17:26:03,118 - DEBUG - No visa library specified, trying to find alternatives.
-2026-07-09 17:26:03,119 - DEBUG - Environment variable PYVISA_LIBRARY is unset.
-2026-07-09 17:26:03,126 - DEBUG - No user defined configuration
-2026-07-09 17:26:03,133 - DEBUG - Automatically found library files: [None, 'C:\\Windows\\system32\\visa32.dll', 'C:\\Windows\\system32\\visa32.dll', 'C:\\Windows\\system32\\visa64.dll', 'C:\\Windows\\system32\\visa64.dll']
-2026-07-09 17:26:03,134 - DEBUG - No user defined library files
-2026-07-09 17:26:03,134 - DEBUG - The IVI implementation available
-2026-07-09 17:26:03,135 - DEBUG - No user defined configuration
-2026-07-09 17:26:03,139 - DEBUG - Automatically found library files: [None, 'C:\\Windows\\system32\\visa32.dll', 'C:\\Windows\\system32\\visa32.dll', 'C:\\Windows\\system32\\visa64.dll', 'C:\\Windows\\system32\\visa64.dll']
-2026-07-09 17:26:03,140 - DEBUG - No user defined library files
-2026-07-09 17:26:03,144 - DEBUG - Library signatures: 90 ok, 0 failed
-2026-07-09 17:26:03,145 - DEBUG - Created library wrapper for C:\Windows\system32\visa32.dll
-2026-07-09 17:26:03,238 - DEBUG - viOpenDefaultRM('<ViObject object at 0x00000205B0CA7950>',) -> 0
-2026-07-09 17:26:03,239 - DEBUG - Created ResourceManager with session 1
-2026-07-09 17:26:04,735 - DEBUG - viParseRsrcEx(1, 'USB::0x0699::0x03A4::C015987::INSTR', 'c_ushort(7)', 'c_ushort(0)', <ctypes.c_char_Array_256 object at 0x00000205B136C5D0>, <ctypes.c_char_Array_256 object at 0x00000205B136C650>, <ctypes.c_char_Array_256 object at 0x00000205B136C6D0>) -> 0
-2026-07-09 17:26:04,736 - DEBUG - USB0::0x0699::0x03A4::C015987::0::INSTR - opening ...
-2026-07-09 17:26:04,746 - DEBUG - viOpen(1, 'USB0::0x0699::0x03A4::C015987::0::INSTR', <AccessModes.no_lock: 0>, 0, '<ViObject object at 0x00000205B136C4D0>') -> 0
-2026-07-09 17:26:04,747 - DEBUG - USB0::0x0699::0x03A4::C015987::0::INSTR - is open with session 2
-2026-07-09 17:26:04,747 - DEBUG - viSetAttribute(2, 1073676310, <VisaBoolean.true: 1>) -> 0
-2026-07-09 17:26:04,749 - DEBUG - viSetAttribute(2, 1073676314, 5000) -> 0
-2026-07-09 17:26:04,752 - DEBUG - viParseRsrcEx(1, 'USB::0x0699::0x03A3::C031362::INSTR', 'c_ushort(7)', 'c_ushort(0)', <ctypes.c_char_Array_256 object at 0x00000205B136CD50>, <ctypes.c_char_Array_256 object at 0x00000205B136CDD0>, <ctypes.c_char_Array_256 object at 0x00000205B136CE50>) -> 0
-2026-07-09 17:26:04,753 - DEBUG - USB0::0x0699::0x03A3::C031362::0::INSTR - opening ...
-2026-07-09 17:26:04,765 - DEBUG - viOpen(1, 'USB0::0x0699::0x03A3::C031362::0::INSTR', <AccessModes.no_lock: 0>, 0, '<ViObject object at 0x00000205B136CC50>') -> 0
-2026-07-09 17:26:04,765 - DEBUG - USB0::0x0699::0x03A3::C031362::0::INSTR - is open with session 3
-2026-07-09 17:26:04,766 - DEBUG - viSetAttribute(3, 1073676310, <VisaBoolean.true: 1>) -> 0
-2026-07-09 17:26:04,767 - DEBUG - viSetAttribute(3, 1073676314, 5000) -> 0
-2026-07-09 17:28:20,610 - DEBUG - Closing ResourceManager (session: 1)
-2026-07-09 17:28:20,611 - DEBUG - USB0::0x0699::0x03A3::C031362::0::INSTR - closing
-2026-07-09 17:28:20,612 - DEBUG - viDisableEvent(3, <EventType.all_enabled: 1073709055>, <EventMechanism.all: 65535>) -> 1073676291
-2026-07-09 17:28:20,613 - DEBUG - viDiscardEvents(3, <EventType.all_enabled: 1073709055>, <EventMechanism.all: 65535>) -> 1073676292
-2026-07-09 17:28:20,615 - DEBUG - viClose(3,) -> 0
-2026-07-09 17:28:20,616 - DEBUG - USB0::0x0699::0x03A3::C031362::0::INSTR - is closed
-2026-07-09 17:28:20,617 - DEBUG - USB0::0x0699::0x03A4::C015987::0::INSTR - closing
-2026-07-09 17:28:20,618 - DEBUG - viDisableEvent(2, <EventType.all_enabled: 1073709055>, <EventMechanism.all: 65535>) -> 1073676291
-2026-07-09 17:28:20,619 - DEBUG - viDiscardEvents(2, <EventType.all_enabled: 1073709055>, <EventMechanism.all: 65535>) -> 1073676292
-2026-07-09 17:28:20,621 - DEBUG - viClose(2,) -> 0
-2026-07-09 17:28:20,621 - DEBUG - USB0::0x0699::0x03A4::C015987::0::INSTR - is closed
-2026-07-09 17:28:20,624 - DEBUG - viClose(1,) -> 0
+2026-07-10 16:35:43,017 - DEBUG - No visa library specified, trying to find alternatives.
+2026-07-10 16:35:43,017 - DEBUG - Environment variable PYVISA_LIBRARY is unset.
+2026-07-10 16:35:43,026 - DEBUG - No user defined configuration
+2026-07-10 16:35:43,031 - DEBUG - Automatically found library files: [None, 'C:\\Windows\\system32\\visa32.dll', 'C:\\Windows\\system32\\visa32.dll', 'C:\\Windows\\system32\\visa64.dll', 'C:\\Windows\\system32\\visa64.dll']
+2026-07-10 16:35:43,032 - DEBUG - No user defined library files
+2026-07-10 16:35:43,034 - DEBUG - The IVI implementation available
+2026-07-10 16:35:43,035 - DEBUG - No user defined configuration
+2026-07-10 16:35:43,041 - DEBUG - Automatically found library files: [None, 'C:\\Windows\\system32\\visa32.dll', 'C:\\Windows\\system32\\visa32.dll', 'C:\\Windows\\system32\\visa64.dll', 'C:\\Windows\\system32\\visa64.dll']
+2026-07-10 16:35:43,042 - DEBUG - No user defined library files
+2026-07-10 16:35:43,046 - DEBUG - Library signatures: 90 ok, 0 failed
+2026-07-10 16:35:43,046 - DEBUG - Created library wrapper for C:\Windows\system32\visa32.dll
+2026-07-10 16:35:43,146 - DEBUG - viOpenDefaultRM('<ViObject object at 0x0000025F4C237AD0>',) -> 0
+2026-07-10 16:35:43,147 - DEBUG - Created ResourceManager with session 1
+2026-07-10 16:35:44,626 - DEBUG - viParseRsrcEx(1, 'USB::0x0699::0x03A4::C015987::INSTR', 'c_ushort(7)', 'c_ushort(0)', <ctypes.c_char_Array_256 object at 0x0000025F4C90C750>, <ctypes.c_char_Array_256 object at 0x0000025F4C90C7D0>, <ctypes.c_char_Array_256 object at 0x0000025F4C90C850>) -> 0
+2026-07-10 16:35:44,627 - DEBUG - USB0::0x0699::0x03A4::C015987::0::INSTR - opening ...
+2026-07-10 16:35:44,637 - DEBUG - viOpen(1, 'USB0::0x0699::0x03A4::C015987::0::INSTR', <AccessModes.no_lock: 0>, 0, '<ViObject object at 0x0000025F4C90C650>') -> 0
+2026-07-10 16:35:44,638 - DEBUG - USB0::0x0699::0x03A4::C015987::0::INSTR - is open with session 2
+2026-07-10 16:35:44,638 - DEBUG - viSetAttribute(2, 1073676310, <VisaBoolean.true: 1>) -> 0
+2026-07-10 16:35:44,640 - DEBUG - viSetAttribute(2, 1073676314, 5000) -> 0
+2026-07-10 16:35:44,643 - DEBUG - viParseRsrcEx(1, 'USB::0x0699::0x03A3::C031362::INSTR', 'c_ushort(7)', 'c_ushort(0)', <ctypes.c_char_Array_256 object at 0x0000025F4C90CED0>, <ctypes.c_char_Array_256 object at 0x0000025F4C90CF50>, <ctypes.c_char_Array_256 object at 0x0000025F4C90CFD0>) -> 0
+2026-07-10 16:35:44,644 - DEBUG - USB0::0x0699::0x03A3::C031362::0::INSTR - opening ...
+2026-07-10 16:35:44,655 - DEBUG - viOpen(1, 'USB0::0x0699::0x03A3::C031362::0::INSTR', <AccessModes.no_lock: 0>, 0, '<ViObject object at 0x0000025F4C90CDD0>') -> 0
+2026-07-10 16:35:44,656 - DEBUG - USB0::0x0699::0x03A3::C031362::0::INSTR - is open with session 3
+2026-07-10 16:35:44,657 - DEBUG - viSetAttribute(3, 1073676310, <VisaBoolean.true: 1>) -> 0
+2026-07-10 16:35:44,657 - DEBUG - viSetAttribute(3, 1073676314, 5000) -> 0
+2026-07-10 16:36:24,351 - DEBUG - viWrite(2, b'MEASUrement:MEAS2:VALue?\r\n', 26, 'c_ulong(26)') -> 0
+2026-07-10 16:36:24,351 - DEBUG - USB0::0x0699::0x03A4::C015987::0::INSTR - reading 20480 bytes (last status <StatusCode.success_max_count_read: 1073676294>)
+2026-07-10 16:36:24,484 - DEBUG - viRead(2, <ctypes.c_char_Array_20480 object at 0x0000025F4C956750>, 20480, 'c_ulong(15)') -> 0
+2026-07-10 16:36:24,486 - DEBUG - viWrite(2, b'MEASUrement:MEAS3:VALue?\r\n', 26, 'c_ulong(26)') -> 0
+2026-07-10 16:36:24,489 - DEBUG - USB0::0x0699::0x03A4::C015987::0::INSTR - reading 20480 bytes (last status <StatusCode.success_max_count_read: 1073676294>)
+2026-07-10 16:36:24,599 - DEBUG - viRead(2, <ctypes.c_char_Array_20480 object at 0x0000025F4C9567D0>, 20480, 'c_ulong(15)') -> 0
+2026-07-10 16:36:26,980 - DEBUG - viWrite(2, b'MEASUrement:MEAS2:VALue?\r\n', 26, 'c_ulong(26)') -> 0
+2026-07-10 16:36:26,982 - DEBUG - USB0::0x0699::0x03A4::C015987::0::INSTR - reading 20480 bytes (last status <StatusCode.success_max_count_read: 1073676294>)
+2026-07-10 16:36:27,089 - DEBUG - viRead(2, <ctypes.c_char_Array_20480 object at 0x0000025F4C9564D0>, 20480, 'c_ulong(15)') -> 0
+2026-07-10 16:36:27,091 - DEBUG - viWrite(2, b'MEASUrement:MEAS3:VALue?\r\n', 26, 'c_ulong(26)') -> 0
+2026-07-10 16:36:27,093 - DEBUG - USB0::0x0699::0x03A4::C015987::0::INSTR - reading 20480 bytes (last status <StatusCode.success_max_count_read: 1073676294>)
+2026-07-10 16:36:27,204 - DEBUG - viRead(2, <ctypes.c_char_Array_20480 object at 0x0000025F4C9570D0>, 20480, 'c_ulong(15)') -> 0
+2026-07-10 16:36:29,615 - DEBUG - viWrite(2, b'MEASUrement:MEAS2:VALue?\r\n', 26, 'c_ulong(26)') -> 0
+2026-07-10 16:36:29,616 - DEBUG - USB0::0x0699::0x03A4::C015987::0::INSTR - reading 20480 bytes (last status <StatusCode.success_max_count_read: 1073676294>)
+2026-07-10 16:36:29,724 - DEBUG - viRead(2, <ctypes.c_char_Array_20480 object at 0x0000025F4C956FD0>, 20480, 'c_ulong(15)') -> 0
+2026-07-10 16:36:29,726 - DEBUG - viWrite(2, b'MEASUrement:MEAS3:VALue?\r\n', 26, 'c_ulong(26)') -> 0
+2026-07-10 16:36:29,729 - DEBUG - USB0::0x0699::0x03A4::C015987::0::INSTR - reading 20480 bytes (last status <StatusCode.success_max_count_read: 1073676294>)
+2026-07-10 16:36:29,838 - DEBUG - viRead(2, <ctypes.c_char_Array_20480 object at 0x0000025F4C9578D0>, 20480, 'c_ulong(15)') -> 0
+2026-07-10 16:36:32,242 - DEBUG - viWrite(2, b'MEASUrement:MEAS2:VALue?\r\n', 26, 'c_ulong(26)') -> 0
+2026-07-10 16:36:32,244 - DEBUG - USB0::0x0699::0x03A4::C015987::0::INSTR - reading 20480 bytes (last status <StatusCode.success_max_count_read: 1073676294>)
+2026-07-10 16:36:32,347 - DEBUG - viRead(2, <ctypes.c_char_Array_20480 object at 0x0000025F4C9577D0>, 20480, 'c_ulong(15)') -> 0
+2026-07-10 16:36:32,349 - DEBUG - viWrite(2, b'MEASUrement:MEAS3:VALue?\r\n', 26, 'c_ulong(26)') -> 0
+2026-07-10 16:36:32,352 - DEBUG - USB0::0x0699::0x03A4::C015987::0::INSTR - reading 20480 bytes (last status <StatusCode.success_max_count_read: 1073676294>)
+2026-07-10 16:36:32,462 - DEBUG - viRead(2, <ctypes.c_char_Array_20480 object at 0x0000025F4C9577D0>, 20480, 'c_ulong(15)') -> 0
+2026-07-10 16:36:34,834 - DEBUG - viWrite(2, b'MEASUrement:MEAS2:VALue?\r\n', 26, 'c_ulong(26)') -> 0
+2026-07-10 16:36:34,835 - DEBUG - USB0::0x0699::0x03A4::C015987::0::INSTR - reading 20480 bytes (last status <StatusCode.success_max_count_read: 1073676294>)
+2026-07-10 16:36:34,941 - DEBUG - viRead(2, <ctypes.c_char_Array_20480 object at 0x0000025F4C957DD0>, 20480, 'c_ulong(15)') -> 0
+2026-07-10 16:36:34,942 - DEBUG - viWrite(2, b'MEASUrement:MEAS3:VALue?\r\n', 26, 'c_ulong(26)') -> 0
+2026-07-10 16:36:34,944 - DEBUG - USB0::0x0699::0x03A4::C015987::0::INSTR - reading 20480 bytes (last status <StatusCode.success_max_count_read: 1073676294>)
+2026-07-10 16:36:35,055 - DEBUG - viRead(2, <ctypes.c_char_Array_20480 object at 0x0000025F4C957DD0>, 20480, 'c_ulong(15)') -> 0
+2026-07-10 16:36:37,467 - DEBUG - viWrite(2, b'MEASUrement:MEAS2:VALue?\r\n', 26, 'c_ulong(26)') -> 0
+2026-07-10 16:36:37,467 - DEBUG - USB0::0x0699::0x03A4::C015987::0::INSTR - reading 20480 bytes (last status <StatusCode.success_max_count_read: 1073676294>)
+2026-07-10 16:36:37,573 - DEBUG - viRead(2, <ctypes.c_char_Array_20480 object at 0x0000025F4C957B50>, 20480, 'c_ulong(15)') -> 0
+2026-07-10 16:36:37,575 - DEBUG - viWrite(2, b'MEASUrement:MEAS3:VALue?\r\n', 26, 'c_ulong(26)') -> 0
+2026-07-10 16:36:37,577 - DEBUG - USB0::0x0699::0x03A4::C015987::0::INSTR - reading 20480 bytes (last status <StatusCode.success_max_count_read: 1073676294>)
+2026-07-10 16:36:37,688 - DEBUG - viRead(2, <ctypes.c_char_Array_20480 object at 0x0000025F4C957B50>, 20480, 'c_ulong(15)') -> 0
+2026-07-10 16:36:52,858 - DEBUG - Closing ResourceManager (session: 1)
+2026-07-10 16:36:52,860 - DEBUG - USB0::0x0699::0x03A4::C015987::0::INSTR - closing
+2026-07-10 16:36:52,860 - DEBUG - viDisableEvent(2, <EventType.all_enabled: 1073709055>, <EventMechanism.all: 65535>) -> 1073676291
+2026-07-10 16:36:52,862 - DEBUG - viDiscardEvents(2, <EventType.all_enabled: 1073709055>, <EventMechanism.all: 65535>) -> 1073676292
+2026-07-10 16:36:52,863 - DEBUG - viClose(2,) -> 0
+2026-07-10 16:36:52,864 - DEBUG - USB0::0x0699::0x03A4::C015987::0::INSTR - is closed
+2026-07-10 16:36:52,865 - DEBUG - USB0::0x0699::0x03A3::C031362::0::INSTR - closing
+2026-07-10 16:36:52,868 - DEBUG - viDisableEvent(3, <EventType.all_enabled: 1073709055>, <EventMechanism.all: 65535>) -> 1073676291
+2026-07-10 16:36:52,869 - DEBUG - viDiscardEvents(3, <EventType.all_enabled: 1073709055>, <EventMechanism.all: 65535>) -> 1073676292
+2026-07-10 16:36:52,871 - DEBUG - viClose(3,) -> 0
+2026-07-10 16:36:52,872 - DEBUG - USB0::0x0699::0x03A3::C031362::0::INSTR - is closed
+2026-07-10 16:36:52,874 - DEBUG - viClose(1,) -> 0
