@@ -4,6 +4,7 @@ import time
 import numpy as np
 from PIL import Image
 from logic.Plupy.image import image
+import logic.devices.pyCurlModel as qTune
 
 class Experiment:
     def __init__(self, vacuum_meter, data_manager, pg, teensy, osc_TDS2014C, osc_DPO2024B, cam, uno, coherent):
@@ -70,6 +71,9 @@ class Experiment:
         """
         print("Setting up devices for experiment.")
         current_prepulse_mode = self.flash_camera_power_setup(option)
+        # When we are not taking a measurement Q-Tune is on internal triggering so change it to external
+        if option == "Q-Tune":
+            qTune.gallopModeExternal()
         print("Waiting for device connections.")
         print("loading", end = "")
         for i in range(10): # sleep for 10 seconds to get all devices connected
@@ -114,7 +118,7 @@ class Experiment:
             if valid_measurement:
                 self.E_valid.set()
 
-                true_delay = self.get_pirl_timestamp(self.data_tdc, self.flash_delay_s)
+                true_delay = self.get_pirl_timestamp(self.data_tdc)
                 flash_voltage = self.osc_TDS2014C.get_value(2) # flash lamp voltage from oscilloscope
                 pulse_voltage = self.osc_TDS2014C.get_value(3) # pirl split beam voltage from oscilloscope
                 print(f"Plume lifetime: {true_delay} ns")
@@ -292,4 +296,22 @@ class Experiment:
         return image.resize((new_width, new_height), Image.LANCZOS)
 
 
+    def get_pirl_timestamp(self, data):
+        """
+        DESCRIPTION:
+            Return the time in nanoseconds at which the PIRL ablation pulse occurs. Because many PIRL pulses are recorded by the TDC, this function returns the relevant one to our process. 
+            It simply returns whichever is closest in time to the flash lamp.
+        PARAMETERS
+            data: a dictionary with the timestamps corresponding to each channel. 
+        RETURN: 
+            result: the time in nanoseconds since the TDC started recording at which the ablation pulse fired.
+        """
+        result = 0
+        pirl_timestamps = data["PIRL PD"]
+        pirl_diffs  = [data["flash PD"][-1] - stamp for stamp in pirl_timestamps]
         
+        abs_pirl_diffs = [abs(diff) for diff in pirl_diffs]
+        
+        result_index = abs_pirl_diffs.index(min(abs_pirl_diffs))
+        result = pirl_diffs[result_index]
+        return result
