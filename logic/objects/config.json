@@ -21,7 +21,7 @@
     "Kp": 0.4,
     "Ki": 0.0,
     "Kd": 0.0,
-    "target temp": 15.0,
+    "target temp": 22.0,
     "autocorrect": false,
     "current x pos": 0.0,
     "current y pos": 0.0,

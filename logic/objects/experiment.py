@@ -2,7 +2,7 @@ from threading import Event, Thread, Lock
 import threading
 import time
 import numpy as np
-from PIL import Image, ImageTk
+from PIL import Image
 from logic.Plupy.image import image as pl_img
 import logic.devices.pyCurlModel as qTune
 import os
@@ -10,7 +10,7 @@ import logic.Plupy.Plupy as pl
 
 
 class Experiment:
-    def __init__(self, vacuum_meter, data_manager, pg, teensy, osc_TDS2014C, osc_DPO2024B, cam, uno, coherent, image_frame):
+    def __init__(self, vacuum_meter, data_manager, pg, teensy, osc_TDS2014C, osc_DPO2024B, cam, uno, coherent):
         """
         DESCRIPTION:
 
@@ -19,8 +19,12 @@ class Experiment:
         """
         # Event to track if the experiment is running or not
         self.e_experimentOn = Event()
+
         self.E_cam = Event()
         self.E_valid = Event()
+        self.image_callback = None
+        self.text_callback = None
+        self.text_callback_invalid = None
 
         self.vacuumMeter = vacuum_meter
         self.dataManager = data_manager
@@ -31,21 +35,17 @@ class Experiment:
         self.cam = cam
         self.uno = uno
         self.coherent = coherent
-        self.imageFrame = image_frame
 
 
 
-    def stop(self):
-        self.e_experimentOn.clear()
+    
 
-
-    def start(self, total_measurements, mode, option):
-        self.e_experimentOn.set()
+    def start(self, total_measurements, mode, option, folder):
         self.T_Pressure = Thread(target=self.vaccum_monitoring, name = "T_Pressure")
         self.T_Pressure.start()
     
         
-        self.T_Experiment = Thread(target=self.experiment, args=(option, total_measurements, mode), name = "T_Experiment")
+        self.T_Experiment = Thread(target=self.experiment, args=(option, folder, total_measurements, mode), name = "T_Experiment")
         self.T_Experiment.start()
 
 
@@ -62,7 +62,7 @@ class Experiment:
                 pass
 
 
-    def experiment(self, option, total_measurements = 0, mode = None):
+    def experiment(self, option, folder, total_measurements = 0, mode = None):
         """
         DESCRIPTION:
             Target function of the T_Experiment thread. Triggers Arduino Uno, which then starts TDC and starts Teensy measure mode. Teensy then coordinates the shutter opening, flash lamp and camera triggers. 
@@ -84,7 +84,7 @@ class Experiment:
             time.sleep(1)
             print(".", end = "")
         print("")
-        self.folder = self.imageFrame.get_folder_entry()
+        self.folder = folder
         self.dataManager.update_config_file()
         print("Setup complete, starting Experiment loop")
         i=0
@@ -138,7 +138,8 @@ class Experiment:
                 #with self.visa_lock:
                  #   firing_delay = float(self.osc_DPO2024B.get_value(2)) * 1e6
 
-                self.imageFrame.update_text(
+                if self.text_callback:
+                    self.text_callback(
                     true_delay = true_delay, 
                     flash_voltage = flash_voltage, 
                     pulse_voltage = pulse_voltage,
@@ -148,7 +149,9 @@ class Experiment:
                 self.curr_true_delay = true_delay
                 self.curr_delay_set_ns = delay_set_ns
                 self.curr_flash_voltage = flash_voltage
+                self.curr_p_voltage = pulse_voltage
                 self.curr_prepulse_mode = current_prepulse_mode
+                self.curr_delay_set_ns = delay_set_ns
                 #self.curr_firing_delay = firing_delay
 
                 if self.dataManager.V_save.get():# if save button pressed
@@ -205,7 +208,8 @@ class Experiment:
                 # !!! displaying images and values
             else: # Invald data
                 self.E_valid.clear()
-                self.imageFrame.update_text_invalid()
+                if self.text_callback_invalid:
+                    self.text_callback_invalid()
                 time.sleep(0.4)
 
             #stop pulse generator
@@ -227,6 +231,31 @@ class Experiment:
         # With the experimental thread ended, the user can choose to start experiment again
         print("Experimental thread ended.")
 
+
+    def save_current(self):
+        """
+        DESCRIPTION:
+            Creates T_SavingCurrent thread that runs self.saving() function to save images as they are taken.
+        PARAMETERS
+            None.
+        RETURN: 
+            None.
+            
+        """
+        HandPickedFolder = os.path.join(self.folder,"handpicked")
+        os.makedirs(HandPickedFolder, exist_ok=True)
+        self.T_SavingCurrent = Thread(
+            name = "T_SavingCurrent", 
+            target=self.saving, 
+            args = (HandPickedFolder,
+                    self.curr_true_delay,
+                    self.curr_delay_set_ns,
+                    self.currImage,
+                    self.curr_flash_voltage,
+                    self.curr_p_voltage,
+                    self.curr_prepulse_mode))
+        self.T_SavingCurrent.start()
+        self.T_SavingCurrent.join()
 
 
     def saving(self, folder, delay_true, delay_set, image, voltage, p_voltage, isPrePulse, firingDelay = 0):
@@ -265,8 +294,6 @@ class Experiment:
             lens = self.dataManager.V_lens.get()
             lens_height = self.dataManager.V_lens_height.get()
             #pressure = self.pressure
-            print(DataFolder)
-            print(os.path.exists(DataFolder))
             with open(DataFolder + "/" + filename + ".csv", "w") as file:
                 file.write("Set Delay(ns), True Delay(ns), Voltage(V), q1c, lens focal length(mm), lens height(mm), pressure(mbar), Pulse Voltage (V), Prepulse, Firing Delay")
                 file.write("\n")
@@ -389,17 +416,16 @@ class Experiment:
             C_img = pl_img()
             image_scale = C_img.add_scale_bar(image, 4095)
             image_norm = (image_scale / 16).astype(np.uint8)
-            image_resized = self.imageFrame.resize_image(Image.fromarray(image_norm))
-            img = image_resized
+            
             
             # Copying raw image buffer onto the 2D array local to experimental thread
             local_image[:] = image
 
             # Displaying the modified image
-            self.photo = ImageTk.PhotoImage(img)
-            self.imageFrame.update_photo_display(photo = self.photo)
+            if self.image_callback:
+                self.image_callback(image_norm)
             
-
+            self.currImage = image
             return
         
 

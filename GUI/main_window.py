@@ -5,7 +5,8 @@ from tkinter import ttk
 from tkinter import messagebox
 import time
 import serial
-
+import threading
+from controllers.experiment import ExperimentController
 from GUI.frames.laser import LaserFrame
 from GUI.frames.image import ImageFrame
 from GUI.frames.heater import HeatingFrame
@@ -18,7 +19,6 @@ from GUI.frames.motor import MotorFrame
 from GUI.frames.rs_flash_delay import RSFlashDelay
 
 from logic.objects.laser import Laser
-from logic.objects.PIDheater import Heater
 from logic.objects.experiment import Experiment
 from logic.objects.pulse_generator import PulseGenerator
 from logic.objects.motor import Motor
@@ -76,18 +76,11 @@ class MainWindow(tk.Tk):
         self.motor = stepper_motor(COM_ports["motor"], 9600, serial.SEVENBITS, serial.PARITY_ODD, serial.STOPBITS_TWO, self.motor_con)
         self.cam = thor_camera()
         self.coherent = Coherent(COM_ports["Coherent"], 19200, serial.EIGHTBITS, serial.PARITY_NONE,  serial.STOPBITS_ONE, self.coherent_con)
-        
-        # Data storage object
-        self.dataManager = DataManager()
-        
-        # Image frame
-        self.imageFrame = ImageFrame(
-            parent = self.Experiment_Frame,
-            data_manager = self.dataManager)
-        
-        
+    
+    
 
         # Create instances of objects
+        self.dataManager = DataManager()
         self.laser = Laser(
             teensy=self.teensy)
         self.experiment = Experiment(
@@ -99,18 +92,23 @@ class MainWindow(tk.Tk):
             osc_DPO2024B = self.osc_DPO2024B,
             cam = self.cam,
             uno = self.uno,
-            coherent = self.coherent,
-            image_frame=self.imageFrame) 
-        self.heater = Heater()
+            coherent = self.coherent) 
         self.pg = PulseGenerator()
         self.motor = Motor()
         self.flash_delay_series = FlashDelaySeries()
 
-        # Laser frame
+        # Image frame
+        self.imageFrame = ImageFrame(
+            parent = self.Experiment_Frame,
+            data_manager = self.dataManager)
+
+        self.experimentController = ExperimentController(experiment = self.experiment, image_frame= self.imageFrame)
+
+        #Frames
         self.laserControlFrame = LaserFrame(
             parent=self.Experiment_Frame, 
             laser=self.laser, 
-            experiment=self.experiment,
+            experiment_controller=self.experimentController,
             data_manager = self.dataManager)
         
         # Create a canvas for scrollable content
@@ -169,7 +167,7 @@ class MainWindow(tk.Tk):
  #           pg_control_frame= self.pgControlFrame, 
  #           flash_delay_series= flash_delay_series)
 
-
+        
 
         # This line forces self.on_close to run whenever the red X is pressed on the GUI 
         self.protocol("WM_DELETE_WINDOW", self.on_close)
@@ -186,41 +184,30 @@ class MainWindow(tk.Tk):
             if self.laser.e_laserOn.is_set():
                 self.laser.toggle()
                 
-            if self.heater.e_heaterOn.is_set():
-                self.heater.toggle()
+            if self.heaterControlFrame.e_heaterOn.is_set():
+                self.heaterControlFrame.heater_toggle()
             
             if self.experiment.e_experimentOn.is_set():
                 self.experiment.toggle()
-                # self.StopExperiment() !!! do we need something similar?
                 
                 
             #if self.F_1Hz:
             #    self.F_1Hz = False
             #    self.B_1Hz.config(text="Start 1Hz Imaging")
             #    self.Stop1Hz()    !!! implement later
-            
-            # self.heater.stop() !!! need?
+        
                 
             time.sleep(3)
             # Destroy the main window
             # check what threads are still running:
             
-            # self.E_check_heater.clear() # tell the heater thread to stop checking temperrature. !!! need to implement
+            self.heaterControlFrame.e_checkHeater.clear() # tell the heater thread to stop checking temperature.
 
-        #    print(f"check heater Event value: {self.E_check_heater.is_set()}")
-        #    for thread in threading.enumerate():
-        #        print(f"{thread.name}, Alive: {thread.is_alive()}, {thread.daemon}")
-        #        # if thread.name !="MainThread":
-        #        #     thread.join(timeout = 5)
-        #        #     if thread.is_alive():
-        #        #         print(f"{thread.name} failed to close in time.")
-        #    # closing the check_heater thread:
-        #    if hasattr(self, "T_check_heater") and self.T_check_heater.is_alive():
-        #        print("Waiting for heater thread to close . . ")
-        #        self.T_check_heater.join(timeout = 5)
-        #        if self.T_check_heater.is_alive():
-        #            print("T_check_heater did not exit in time!")
-        #        else:
-        #            print("T_check_heater successfully closed")    !!! need
+            print(f"check heater Event value: {self.heaterControlFrame.e_checkHeater.is_set()}")
+            for thread in threading.enumerate():
+                print(f"{thread.name}, Alive: {thread.is_alive()}, {thread.daemon}")
+ 
+            # closing the check_heater thread:
+            self.heaterControlFrame.close_check_heater()
 
             self.destroy()

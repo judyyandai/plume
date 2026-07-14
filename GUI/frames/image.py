@@ -1,27 +1,16 @@
 import tkinter as tk
-from PIL import Image
+from PIL import Image, ImageTk
 
 class ImageFrame(tk.LabelFrame):
     def __init__(self, parent, data_manager):
         super().__init__(parent, text="Image Display", padx=0, pady=0)
         self.pack(side = tk.RIGHT, anchor = "ne", padx=5, pady=5, fill="both", expand=True)
 
-        #!!! do we need the save current button
 
         self.data_manager = data_manager
+        self.save_current_callback = None
 
-        # Frame for displaying parametesr about bubble
-        Time_frame =  tk.Frame(self, padx=0, pady=0)
-        Time_frame.pack(side="top", padx=0, pady=0)
-        self.time_label = tk.Label(Time_frame, text = "")
-        self.time_label.pack(side=tk.LEFT, padx=5)
         
-        # Frame for displaying the picture
-        Picture_frame = tk.Frame(self, padx=10, pady=10)
-        Picture_frame.pack(side="bottom", padx=20, pady=20, fill="both", expand=True)
-        
-        self.image_label = tk.Label(Picture_frame, text="")
-        self.image_label.pack(fill = "both", expand = True)
 
 
         # Make folder Entry frame
@@ -37,12 +26,32 @@ class ImageFrame(tk.LabelFrame):
         self.folder_entry.insert(0, self.data_manager.folder.get())
         self.folder_entry.pack(side=tk.LEFT, fill = 'x')
 
+        # Frame for displaying parametesr about bubble
+        Time_frame =  tk.Frame(self, padx=0, pady=0)
+        Time_frame.pack(side="top", padx=0, pady=0)
+        self.time_label = tk.Label(Time_frame, text = "")
+        self.time_label.pack(side=tk.LEFT, padx=5)
+        
+        # Frame for displaying the picture
+        Picture_frame = tk.Frame(self, padx=10, pady=10)
+        Picture_frame.pack(side="bottom", padx=20, pady=20, fill="both", expand=True)
+        
+        self.image_label = tk.Label(Picture_frame, text="")
+        self.image_label.pack(fill = "both", expand = True)
+
+        #save current image button
+        currSave_button = tk.Button(self, text="Save Current", command=self.save_current)
+        currSave_button.pack(anchor = "nw",side = "left", pady=40, padx = 20)
+
+
+    def save_current(self):
+        if self.save_current_callback:
+            self.save_current_callback()
 
     def get_folder_entry(self):
         return self.folder_entry.get()
 
 
-        
     def update_text(self, true_delay, flash_voltage, pulse_voltage, pulse_energy, pressure = 0, firing_delay = 0):
         display_message = f"Plume lifetime: {true_delay} ns\nFlash Voltage = {flash_voltage:.3f} V \n Pressure = {pressure:.3e} mbar \n Current Pulse Voltage =  {pulse_voltage:.3f} V \n Firing Delay = {firing_delay:.2f} us \n Pulse Energy(J) = {pulse_energy}"
         self.time_label.configure(text = display_message , font = ("Roboto", 12))
@@ -50,8 +59,10 @@ class ImageFrame(tk.LabelFrame):
     def update_text_invalid(self):
         self.time_label.configure(text = "INVALID" , font = ("Roboto", 12))
 
-    def update_photo_display(self, photo):
-        self.image_label.configure(image = photo)
+    def update_photo_display(self, image):
+        image_resized = self.resize_image(Image.fromarray(image))
+        self.photo = ImageTk.PhotoImage(image_resized)
+        self.image_label.configure(image = self.photo)
 
     def resize_image(self, image):
         """
