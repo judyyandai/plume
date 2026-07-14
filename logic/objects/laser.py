@@ -23,8 +23,8 @@ class Laser():
         self.frequency = 100 
         self.pulse_spacing = "prepulse" #only relevant for PIRL (prepulse 2ms, no prepulse 8ms)
 
-        # Default Q-Tune laser to internal triggering to confirm ethernet connection with Q-Tune is open
-        qTune.trigModeInternal()
+        # Default Q-Tune laser to internal triggering to confirm ethernet connection with Q-Tune is open 
+        qTune.trigModeInternal() # !!! might be cause of initial firing bug
         
         #Event to track if the laser is on or off
         self.e_laserOn = Event()

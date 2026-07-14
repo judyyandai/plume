@@ -176,7 +176,6 @@ class LaserFrame(ContainerFrame):
                 title = "Shutter Reminder", 
                 message="Make sure to close the shutter before proceeding! The pulses will fire correctly only if the shutter is closed.")
             if user_entered_input_values and user_closed_shutter:
-                print("Starting Experiment.")
                 if self.laser.mode == "Regular Pulse":
                     messagebox.showinfo(title = 'Invalid laser mode', message = """"Please change laser to Gallop Mode before measuring.
                                     This is the only valid laser mode for measurement.""")

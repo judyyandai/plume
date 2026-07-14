@@ -2,9 +2,12 @@ from threading import Event, Thread, Lock
 import threading
 import time
 import numpy as np
-from PIL import Image
-from logic.Plupy.image import image
+from PIL import Image, ImageTk
+from logic.Plupy.image import image as pl_img
 import logic.devices.pyCurlModel as qTune
+import os
+import logic.Plupy.Plupy as pl
+
 
 class Experiment:
     def __init__(self, vacuum_meter, data_manager, pg, teensy, osc_TDS2014C, osc_DPO2024B, cam, uno, coherent, image_frame):
@@ -81,8 +84,12 @@ class Experiment:
             time.sleep(1)
             print(".", end = "")
         print("")
+        self.folder = self.imageFrame.get_folder_entry()
+        self.dataManager.update_config_file()
         print("Setup complete, starting Experiment loop")
         i=0
+
+        lifetimesCalibration = []
 
         #######################################################
         while self.e_experimentOn.is_set():
@@ -91,7 +98,6 @@ class Experiment:
          
             a=time.time()
             self.flash_delay_s = self.dataManager.V_FlashDelay_us.get() *10**(-6)# Get flash delay in config file
-            # self.folder.set(self.folder_entry.get()) #!!! get folder somehow
 
             if self.E_cam.is_set(): # Checking if some of the settings changed with the camera and updating it
                 gain = self.dataManager.V_CamGain.get()
@@ -120,6 +126,7 @@ class Experiment:
                 self.E_valid.set()
 
                 true_delay = self.get_pirl_timestamp(self.data_tdc)
+                lifetimesCalibration.append(true_delay)
                 flash_voltage = self.osc_TDS2014C.get_value(2) # flash lamp voltage from oscilloscope
                 pulse_voltage = self.osc_TDS2014C.get_value(3) # pirl split beam voltage from oscilloscope
                 pulse_energy = 0
@@ -136,6 +143,63 @@ class Experiment:
                     flash_voltage = flash_voltage, 
                     pulse_voltage = pulse_voltage,
                     pulse_energy = pulse_energy)
+                delay_set_ns = round(self.flash_delay_s*10**9) 
+                
+                self.curr_true_delay = true_delay
+                self.curr_delay_set_ns = delay_set_ns
+                self.curr_flash_voltage = flash_voltage
+                self.curr_prepulse_mode = current_prepulse_mode
+                #self.curr_firing_delay = firing_delay
+
+                if self.dataManager.V_save.get():# if save button pressed
+                    # Wait until the image buffer is copied onto the local 
+                    # image variable
+                    # Start a transisent camera thread
+                    time.sleep(0.2)
+                    # If the image variable isn't updated then there is a
+                    # retrival error. I found that it is beneficial to 
+                    # wait a bit after the error occur. Usually error occur 
+                    # when you used up all threads, so waiting a bit allow
+                    # more threads to be freed up. 
+                    # Note to the future interns, there are better ways 
+                    # to solve this issue.
+                    if(np.all(image == 0)):
+                        print("Saving fail, image retrieval error")
+                        time.sleep(3)
+                    else:
+                        # Depending on the mode, there are different saving
+                        # format. In either case, a saving thread would be 
+                        # created for EACH set of measurment data and image
+                        if mode == "ps":
+                            self.T_Saving = Thread(
+                                target=self.saving, 
+                                name = "T_Saving", 
+                                args = (os.path.join(self.folder, "q1c" + str(self.q1c_now)),
+                                        true_delay,
+                                        delay_set_ns, 
+                                        image, 
+                                        flash_voltage,
+                                        pulse_voltage,
+                                        current_prepulse_mode))
+                        else:
+                            self.T_Saving = Thread(
+                                target=self.saving, 
+                                name = "T_Saving", 
+                                args = (self.folder,
+                                        true_delay,
+                                        delay_set_ns,
+                                        image, 
+                                        flash_voltage,
+                                        pulse_voltage,
+                                        current_prepulse_mode))
+                      
+                        self.T_Saving.start()
+                        self.T_Saving.join()
+                        
+                        # Again, artificially insert delay to not use up all
+                        # threads
+                        time.sleep(0.2)
+                            
                 
 
                 # !!! displaying images and values
@@ -155,11 +219,77 @@ class Experiment:
 
         # Disarm the camera when the experimental thread ends
         self.cam.camera.disarm() 
-        self.cam.close_camera()  
+        self.cam.close_camera()
+
+        # Put Q-Tune back into internal triggering
+        qTune.gallopModeInternal()  
         
         # With the experimental thread ended, the user can choose to start experiment again
         print("Experimental thread ended.")
 
+
+
+    def saving(self, folder, delay_true, delay_set, image, voltage, p_voltage, isPrePulse, firingDelay = 0):
+        #A thread function that save the data currently display on the GUI
+        # self.ImageFolder = self.ImageFolder_entry.get()
+        # self.DataFolder = self.DataFolder_entry.get()
+        
+        """
+        DESCRIPTION:
+            Target function of the thread T_SavingCurrent. 
+        PARAMETERS
+            delay_true: The true, measured flash delay (i.e. plume lifetime)
+            delay_set: The set/requested flash delay
+            image: The image object to be saved. 
+            voltage: The photodiode voltage recorded
+            p_voltage: ???? Need to investigated
+            folder: The filepath to save the image to.
+            isPrePulse: Boolean. Was it a prepulse or no prepulse plume
+            firingDelay: Delay between falling edge of the microchip trigger signal and the actual pirl pulse.
+        RETURN: 
+            None.
+            
+        """
+        try:
+            #save the current image before it is replaced
+            image_copy = np.copy(image)
+            
+            ImageFolder =  os.path.join(folder, "images")
+            DataFolder =  os.path.join(folder, "data")
+            
+            os.makedirs(ImageFolder, exist_ok=True)
+            os.makedirs(DataFolder, exist_ok=True)
+            
+            filename = pl.get_file_name(delay_set, delay_true)
+            q1c = self.dataManager.V_q1c.get()
+            lens = self.dataManager.V_lens.get()
+            lens_height = self.dataManager.V_lens_height.get()
+            #pressure = self.pressure
+            print(DataFolder)
+            print(os.path.exists(DataFolder))
+            with open(DataFolder + "/" + filename + ".csv", "w") as file:
+                file.write("Set Delay(ns), True Delay(ns), Voltage(V), q1c, lens focal length(mm), lens height(mm), pressure(mbar), Pulse Voltage (V), Prepulse, Firing Delay")
+                file.write("\n")
+                file.write(f"{delay_set},{delay_true},{voltage},{q1c},{lens},{lens_height},{0},{p_voltage},{isPrePulse}, {firingDelay}")
+            file_path = os.path.join(ImageFolder, filename)
+    
+            # Saving Image as .npy file
+            np.save(file_path, image_copy)
+            
+            # Create a sample image array (if you don't already have one)
+            im_array = (image_copy / np.max(image_copy) * 255).astype(np.uint8)
+            im = Image.fromarray(im_array, mode='L')  # Convert to grayscale
+            # Define the output folder and file path
+            os.makedirs(os.path.join(ImageFolder, "Fast_Loading"), exist_ok=True)
+            png_file_path = os.path.join(ImageFolder, "Fast_Loading", filename + ".png")
+            
+            
+            # Save the image as PNG with DPI metadata
+            im.save(png_file_path, format="PNG", dpi=(150, 150))  # 150 DPI for reasonable scaling
+            
+            print("finished saving!!!")
+        except:
+           print("Saving Error")
 
 
     def flash_camera_power_setup(self, option):
@@ -188,7 +318,7 @@ class Experiment:
                 self.osc_TDS2014C.setup(1, 1, "MAXImum")  # Let the first measurement probe the maximum voltage value of the first channel
 
                 self.osc_DPO2024B.recall(8) #Recall setting 8 on DPO2024B       
-        # q1c_now = self.dataManager.V_q1c.get() # store the current q1c value
+        self.q1c_now = self.dataManager.V_q1c.get() # store the current q1c value
         gain = self.dataManager.V_CamGain.get() # camera gain
         
         self.cam.set_params(exposure, gain, 1, 1)
@@ -256,50 +386,24 @@ class Experiment:
             
             # Note that these modification are made to the image displayed
             # on the GUI, not to the raw image
-            # C_img = image() #!!! once image stuff is implemented
-            # image_scale = C_img.add_scale_bar(image, 4095)
-            # image_norm = (image_scale / 16).astype(np.uint8)
-            # image_resized = self.resize_image(Image.fromarray(image_norm), self.image_label.winfo_width(), self.image_label.winfo_height())
-            # img = image_resized
+            C_img = pl_img()
+            image_scale = C_img.add_scale_bar(image, 4095)
+            image_norm = (image_scale / 16).astype(np.uint8)
+            image_resized = self.imageFrame.resize_image(Image.fromarray(image_norm))
+            img = image_resized
             
             # Copying raw image buffer onto the 2D array local to experimental thread
             local_image[:] = image
 
             # Displaying the modified image
-            #self.photo = ImageTk.PhotoImage(img)
-            #self.window.after(0, lambda: self.image_label.configure(image = self.photo)) #!!! do this in GUI
+            self.photo = ImageTk.PhotoImage(img)
+            self.imageFrame.update_photo_display(photo = self.photo)
             
-            #update class variable right after displaying the image
-            self.currImage = image
-            
+
             return
         
 
-    def resize_image(self, image, max_width, max_height):
-        """
-        DESCRIPTION:
-            Function to resize image. Depending on the proportion of the width and height of the original image 
-            and maximum height&width of the original image, the resized image could be constrain by width or height
-        PARAMETERS:
-            image: image to be resized
-            max_width: Max width of resized image
-            max_height: Max height of resized image
-        RETURN:
-            Resized image. 
-        """
-        image_ratio = image.width / image.height
-        frame_ratio = max_width / max_height
-
-        if frame_ratio > image_ratio:
-            # Constrain by height
-            new_height = max_height
-            new_width = int(new_height * image_ratio)
-        else:
-            # Constrain by width
-            new_width = max_width
-            new_height = int(new_width / image_ratio)
-
-        return image.resize((new_width, new_height), Image.LANCZOS)
+    
 
 
     def get_pirl_timestamp(self, data):
@@ -321,3 +425,6 @@ class Experiment:
         result_index = abs_pirl_diffs.index(min(abs_pirl_diffs))
         result = pirl_diffs[result_index]
         return result
+    
+
+ 

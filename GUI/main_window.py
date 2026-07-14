@@ -10,8 +10,7 @@ from GUI.frames.laser import LaserFrame
 from GUI.frames.image import ImageFrame
 from GUI.frames.heater import HeatingFrame
 from GUI.frames.pulse_generator import PulseGeneratorFrame
-from GUI.frames.file import FileFrame
-from GUI.frames.folder import FolderFrame
+from GUI.frames.lens import LensFrame
 from GUI.frames.camera import CameraFrame
 from GUI.frames.pIRL import pIRLFrame
 from GUI.frames.qTune import QTuneFrame
@@ -78,16 +77,19 @@ class MainWindow(tk.Tk):
         self.cam = thor_camera()
         self.coherent = Coherent(COM_ports["Coherent"], 19200, serial.EIGHTBITS, serial.PARITY_NONE,  serial.STOPBITS_ONE, self.coherent_con)
         
-
-
-        self.imageFrame = ImageFrame(
-            parent = self.Experiment_Frame)
-        
-        
-        # Create instances of objects
+        # Data storage object
         self.dataManager = DataManager()
+        
+        # Image frame
+        self.imageFrame = ImageFrame(
+            parent = self.Experiment_Frame,
+            data_manager = self.dataManager)
+        
+        
+
+        # Create instances of objects
         self.laser = Laser(
-            teensy=self.teensy) 
+            teensy=self.teensy)
         self.experiment = Experiment(
             vacuum_meter=self.vacuumMeter, 
             data_manager=self.dataManager, 
@@ -99,21 +101,18 @@ class MainWindow(tk.Tk):
             uno = self.uno,
             coherent = self.coherent,
             image_frame=self.imageFrame) 
-        
         self.heater = Heater()
         self.pg = PulseGenerator()
         self.motor = Motor()
         self.flash_delay_series = FlashDelaySeries()
 
-        # Frames
+        # Laser frame
         self.laserControlFrame = LaserFrame(
             parent=self.Experiment_Frame, 
             laser=self.laser, 
             experiment=self.experiment,
             data_manager = self.dataManager)
         
-
-
         # Create a canvas for scrollable content
         canvas = tk.Canvas(self.Experiment_Frame, width=500, height = 1500)
         canvas.pack(side="left", anchor = "nw", padx=5, pady= 20)
@@ -130,17 +129,15 @@ class MainWindow(tk.Tk):
         self.scrollbar_frame = tk.Frame(canvas)
         canvas.create_window((0, 0), window=self.scrollbar_frame, anchor="nw")
 
+
         # Frames inside Scrollable Content:
         self.heaterControlFrame = HeatingFrame(
             parent = self.scrollbar_frame, 
             heater = self.heater, 
             data_manager=self.dataManager)
-
-        self.inputsFrame = FileFrame(
-            parent = self.scrollbar_frame)
-
-        self.folderFrame = FolderFrame(
-            parent = self.inputsFrame, 
+        
+        self.lensFrame = LensFrame(
+            parent = self.scrollbar_frame, 
             data_manager=self.dataManager)
 
         self.pgControlFrame = PulseGeneratorFrame(
