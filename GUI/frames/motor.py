@@ -28,7 +28,7 @@ class MotorFrame(ContainerFrame):
         self.step_frame = tk.Frame(self)
         self.step_frame.grid(row=0, column=6, padx=5, pady=0)
 
-        self.entry_MotorStepDistance = EntryBox(self.step_frame, "Distance [mm]", self.data_manager.V_MotorStepDistance, self.data_manager, self.motor_setup)
+        self.entry_MotorStepDistance = EntryBox(self.step_frame, "Increments [mm]", self.data_manager.V_MotorStepDistance, self.data_manager, self.motor_setup)
         ToolTip(self.entry_MotorStepDistance.label, "motor distance")
 
         # position_label_text is the text that gets displayed on the label; doing it this way updates the label dynamically

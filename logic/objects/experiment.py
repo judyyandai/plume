@@ -101,7 +101,7 @@ class Experiment:
             #####################################################
             if valid_measurement:
                 self.E_valid.set()
-                self.valid_measurement(mode, current_prepulse_mode, image)
+                self.valid_measurement(mode, current_prepulse_mode, image, option)
                             
             else: # Invald data
                 self.E_valid.clear()
@@ -140,7 +140,7 @@ class Experiment:
 
 
 
-    def valid_measurement(self, mode, current_prepulse_mode, image):
+    def valid_measurement(self, mode, current_prepulse_mode, image, option):
         """
         DESCRIPTION:
            Assigns plume parameters, calls to update GUI plume text and saves based on mode. 
@@ -169,13 +169,13 @@ class Experiment:
                     pulse_energy = pulse_energy)
         delay_set_ns = round(self.flash_delay_s*10**9) 
                 
-                self.curr_true_delay = true_delay
-                self.curr_flash_voltage = flash_voltage
-                self.curr_p_voltage = pulse_voltage
-                self.curr_prepulse_mode = current_prepulse_mode
-                self.curr_delay_set_ns = delay_set_ns
-                self.laser = option
-                #self.curr_firing_delay = firing_delay
+        self.curr_true_delay = true_delay
+        self.curr_flash_voltage = flash_voltage
+        self.curr_p_voltage = pulse_voltage
+        self.curr_prepulse_mode = current_prepulse_mode
+        self.curr_delay_set_ns = delay_set_ns
+        self.laser = option
+        #self.curr_firing_delay = firing_delay
 
         if self.dataManager.V_save.get():# if save button pressed
                     # Wait until the image buffer is copied onto the local 
@@ -207,20 +207,20 @@ class Experiment:
                                         flash_voltage,
                                         pulse_voltage,
                                         current_prepulse_mode,
-                                        option))
-                        else:
-                            self.T_Saving = Thread(
-                                target=self.saving, 
-                                name = "T_Saving", 
-                                args = (self.folder,
-                                        true_delay,
-                                        delay_set_ns,
-                                        image, 
-                                        flash_voltage,
-                                        pulse_voltage,
-                                        current_prepulse_mode,
-                                        option))
-                      
+                                option))
+                else:
+                    self.T_Saving = Thread(
+                        target=self.saving, 
+                        name = "T_Saving", 
+                        args = (self.folder,
+                                true_delay,
+                                delay_set_ns,
+                                image, 
+                                flash_voltage,
+                                pulse_voltage,
+                                current_prepulse_mode,
+                                option))
+              
                 self.T_Saving.start()
                 self.T_Saving.join()
                         

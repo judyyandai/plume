@@ -22,7 +22,6 @@ from GUI.frames.rs_flash_delay import RSFlashDelay
 from logic.objects.laser import Laser
 from logic.objects.experiment import Experiment
 from logic.objects.pulse_generator import PulseGenerator
-from logic.objects.motor import Motor
 from logic.objects.flash_delay_series import FlashDelaySeries
 from logic.objects.data_manager import DataManager
 
@@ -98,7 +97,6 @@ class MainWindow(tk.Tk):
             coherent = self.coherent,
             visa_lock = self.visa_lock) 
         self.pg = PulseGenerator()
-        self.motor = Motor()
         self.flash_delay_series = FlashDelaySeries()
 
         # Image frame

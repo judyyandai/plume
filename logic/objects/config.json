@@ -5,7 +5,7 @@
     "prepulse": true,
     "camera gain": 20.0,
     "q1c": 1250,
-    "motor step size": 0.05,
+    "motor step size": 1.0,
     "flash delay start": 1.0,
     "flash delay stop": 3.0,
     "flash delay step size": 1.0,
