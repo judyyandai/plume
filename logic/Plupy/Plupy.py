@@ -15,11 +15,8 @@ logging.basicConfig(
     filemode='w'  # Overwrites each time
 )
 
-# COM_ports = {"pg":"COM19", "motor":"COM25", "uno":"COM20",
-#              "vacuumMeter":"COM7", "heater":"COM6", 
-#              "pirl":"COM3", "teensy":"COM21", "Coherent": "COM9"}
-COM_ports = {"pg":"COM19", "motor":"COM25", "uno":"COM20", 
-             "vacuumMeter":"COM7", "heater":"COM26", 
+COM_ports = {"pg":"COM19", "motor":"COM25", "uno":"COM20",
+             "vacuumMeter":"COM7", "heater":"COM6", 
              "pirl":"COM3", "teensy":"COM21", "Coherent": "COM9"}
 
 rm = pyvisa.ResourceManager()

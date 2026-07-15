@@ -7,7 +7,7 @@ from GUI.widgets.tool_tip import ToolTip
  
 
 class LaserFrame(ContainerFrame):
-    def __init__(self, parent, laser, experiment, data_manager):
+    def __init__(self, parent, laser, experiment_controller, data_manager):
         """
         DESCRIPTION:
             Class used to create the laser control panel which contains:
@@ -22,7 +22,7 @@ class LaserFrame(ContainerFrame):
         """
         super().__init__(parent, "Laser Control Panel")
         self.laser = laser
-        self.experiment = experiment
+        self.experiment_controller = experiment_controller
         self.data_manager = data_manager
 
         
@@ -166,8 +166,8 @@ class LaserFrame(ContainerFrame):
         DESCRIPTION:
             Calls toggle function on experiment object, updates GUI.
         """
-        if self.experiment.e_experimentOn.is_set():
-            self.experiment.stop()
+        if self.experiment_controller.experiment_is_set():
+            self.experiment_controller.stop()
         else:
             user_entered_input_values = messagebox.askyesno(
                 title = "Input Values", 
@@ -176,12 +176,11 @@ class LaserFrame(ContainerFrame):
                 title = "Shutter Reminder", 
                 message="Make sure to close the shutter before proceeding! The pulses will fire correctly only if the shutter is closed.")
             if user_entered_input_values and user_closed_shutter:
-                print("Starting Experiment.")
                 if self.laser.mode == "Regular Pulse":
                     messagebox.showinfo(title = 'Invalid laser mode', message = """"Please change laser to Gallop Mode before measuring.
                                     This is the only valid laser mode for measurement.""")
                     return
-                self.experiment.start(total_measurements, mode, option = self.laser.option)
+                self.experiment_controller.start(total_measurements, mode, option = self.laser.option)
         self.update_frame()
 
 
@@ -244,7 +243,7 @@ class LaserFrame(ContainerFrame):
         DESCRIPTION:
             Updates all the GUI elements in laser control panel
         """
-        if self.laser.e_laserOn.is_set() or self.experiment.e_experimentOn.is_set():
+        if self.laser.e_laserOn.is_set() or self.experiment_controller.experiment_is_set():
             self.disable_laser_option()
             self.disable_laser_mode()
         else:
@@ -287,7 +286,7 @@ class LaserFrame(ContainerFrame):
         if self.laser.e_laserOn.is_set():
             self.b_beginMeasure.config(state="disabled")
         else:
-            if self.experiment.e_experimentOn.is_set():
+            if self.experiment_controller.experiment_is_set():
                 self.b_startLaser.config(state="disabled")
             else:
                 self.b_beginMeasure.config(state="normal")
@@ -302,7 +301,7 @@ class LaserFrame(ContainerFrame):
         """
         if self.laser.e_laserOn.is_set():
             self.b_beginMeasure.config(state="normal")
-            if self.experiment.e_experimentOn.is_set():
+            if self.experiment_controller.experiment_is_set():
                 self.b_startLaser.config(state ="disabled")             
             else: 
                 self.b_startLaser.config(state="normal")
@@ -336,7 +335,7 @@ class LaserFrame(ContainerFrame):
         DESCRIPTION:
             Updates the text of the Begin Measuring button based on whether the experiment is running.
         """
-        if self.experiment.e_experimentOn.is_set():
+        if self.experiment_controller.experiment_is_set():
             self.b_beginMeasure.config(
                 text="Stop Experiment"
             )
