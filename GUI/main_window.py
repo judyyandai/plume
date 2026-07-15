@@ -6,6 +6,7 @@ from tkinter import messagebox
 import time
 import serial
 import threading
+from threading import Lock
 from controllers.experiment import ExperimentController
 from GUI.frames.laser import LaserFrame
 from GUI.frames.image import ImageFrame
@@ -80,6 +81,8 @@ class MainWindow(tk.Tk):
     
 
         # Create instances of objects
+        #!!! IF TIME please make this Lock() object an attriibute of hte oscilloscope class, and include 'with Lock:' on every commmunication method
+        self.visa_lock = Lock()  #used for all visa comms with the oscilloscope
         self.dataManager = DataManager()
         self.laser = Laser(
             teensy=self.teensy)
@@ -92,7 +95,8 @@ class MainWindow(tk.Tk):
             osc_DPO2024B = self.osc_DPO2024B,
             cam = self.cam,
             uno = self.uno,
-            coherent = self.coherent) 
+            coherent = self.coherent,
+            visa_lock = self.visa_lock) 
         self.pg = PulseGenerator()
         self.motor = Motor()
         self.flash_delay_series = FlashDelaySeries()
@@ -145,7 +149,8 @@ class MainWindow(tk.Tk):
         
         self.cameraFrame = CameraFrame(
             parent = self.scrollbar_frame, 
-            data_manager= self.dataManager)
+            data_manager= self.dataManager,
+            experiment = self.experiment)
         
         self.pIRLFrame = pIRLFrame(
             parent = self.scrollbar_frame, 

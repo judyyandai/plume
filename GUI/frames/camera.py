@@ -6,7 +6,7 @@ from GUI.widgets.tool_tip import ToolTip
 
 
 class CameraFrame(ContainerFrame):
-    def __init__(self, parent, data_manager):
+    def __init__(self, parent, data_manager, experiment):
         """
         DESCRIPTION:
             Class used to create the camera panel which contains:
@@ -18,6 +18,7 @@ class CameraFrame(ContainerFrame):
         super().__init__(parent, "Thor Labs Camera")
 
         self.data_manager = data_manager
+        self.experiment = experiment
 
         self.entry_Camera_Gain = EntryBox(
             frame = self, 
@@ -31,11 +32,11 @@ class CameraFrame(ContainerFrame):
     def set_cam_gain(self):
         """
         DESCRIPTION:
-            Retrieves the camera gain and pedal width values from the entry boxes, and sets a flag to trigger the camera event in the experimental thread.    
+            Retrieves the camera gain from the entry box, and sets a flag to trigger the camera event in the experimental thread.    
         PARAMETERS:
             None
         RETURN:
             None
         """
         self.entry_Camera_Gain.on_enter()
-        # self.E_cam.set()
+        self.experiment.E_cam.set()
