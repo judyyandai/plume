@@ -147,11 +147,11 @@ class Experiment:
                 delay_set_ns = round(self.flash_delay_s*10**9) 
                 
                 self.curr_true_delay = true_delay
-                self.curr_delay_set_ns = delay_set_ns
                 self.curr_flash_voltage = flash_voltage
                 self.curr_p_voltage = pulse_voltage
                 self.curr_prepulse_mode = current_prepulse_mode
                 self.curr_delay_set_ns = delay_set_ns
+                self.laser = option
                 #self.curr_firing_delay = firing_delay
 
                 if self.dataManager.V_save.get():# if save button pressed
@@ -183,7 +183,8 @@ class Experiment:
                                         image, 
                                         flash_voltage,
                                         pulse_voltage,
-                                        current_prepulse_mode))
+                                        current_prepulse_mode,
+                                        option))
                         else:
                             self.T_Saving = Thread(
                                 target=self.saving, 
@@ -194,7 +195,8 @@ class Experiment:
                                         image, 
                                         flash_voltage,
                                         pulse_voltage,
-                                        current_prepulse_mode))
+                                        current_prepulse_mode,
+                                        option))
                       
                         self.T_Saving.start()
                         self.T_Saving.join()
@@ -253,12 +255,13 @@ class Experiment:
                     self.currImage,
                     self.curr_flash_voltage,
                     self.curr_p_voltage,
-                    self.curr_prepulse_mode))
+                    self.curr_prepulse_mode,
+                    self.laser))
         self.T_SavingCurrent.start()
         self.T_SavingCurrent.join()
 
 
-    def saving(self, folder, delay_true, delay_set, image, voltage, p_voltage, isPrePulse, firingDelay = 0):
+    def saving(self, folder, delay_true, delay_set, image, voltage, p_voltage, isPrePulse, laser, firingDelay = 0):
         #A thread function that save the data currently display on the GUI
         # self.ImageFolder = self.ImageFolder_entry.get()
         # self.DataFolder = self.DataFolder_entry.get()
@@ -295,9 +298,9 @@ class Experiment:
             lens_height = self.dataManager.V_lens_height.get()
             #pressure = self.pressure
             with open(DataFolder + "/" + filename + ".csv", "w") as file:
-                file.write("Set Delay(ns), True Delay(ns), Voltage(V), q1c, lens focal length(mm), lens height(mm), pressure(mbar), Pulse Voltage (V), Prepulse, Firing Delay")
+                file.write("Set Delay(ns), True Delay(ns), Voltage(V), q1c, lens focal length(mm), lens height(mm), pressure(mbar), Pulse Voltage (V), Prepulse, Firing Delay, Laser")
                 file.write("\n")
-                file.write(f"{delay_set},{delay_true},{voltage},{q1c},{lens},{lens_height},{0},{p_voltage},{isPrePulse}, {firingDelay}")
+                file.write(f"{delay_set},{delay_true},{voltage},{q1c},{lens},{lens_height},{0},{p_voltage},{isPrePulse}, {firingDelay}, {laser}")
             file_path = os.path.join(ImageFolder, filename)
     
             # Saving Image as .npy file
