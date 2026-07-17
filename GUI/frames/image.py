@@ -3,30 +3,39 @@ from PIL import Image, ImageTk
 
 class ImageFrame(tk.LabelFrame):
     def __init__(self, parent, data_manager):
+        """
+        DESCRIPTION:
+            Class used to create the frame which contains:
+                - entry for folder that data will be saved to
+                - save checkbox
+                - "save current" button, to save the data of the currently displayed plume
+                - image display of current plume
+                - text display of plume parameters of current plume
+        PARAMETERS:
+            parent - (tk.Frame) the frame image frame is placed in
+            data_manager - (dataManager) accesses and updates config.json files
+        """
         super().__init__(parent, text="Image Display", padx=0, pady=0)
         self.pack(side = tk.RIGHT, anchor = "ne", padx=5, pady=5, fill="both", expand=True)
-
 
         self.data_manager = data_manager
         self.save_current_callback = None
 
-        
-
-
-        # Make folder Entry frame
+        # Folder Entry frame
         self.folder_entry_frame = tk.Frame(self)
         self.folder_entry_frame.pack(padx = 5, pady = 5)
 
-        # Make save check
+        # Save check
         save_check = tk.Checkbutton(self, text="Save", variable=self.data_manager.V_save)
         save_check.pack(side = "top", anchor = 'w', pady = 5, padx = 5)
 
+        # Folder entry
         self.folder_entry = tk.Entry(self.folder_entry_frame,
                                      width = 40)
         self.folder_entry.insert(0, self.data_manager.folder.get())
         self.folder_entry.pack(side=tk.LEFT, fill = 'x')
 
-        # Frame for displaying parametesr about bubble
+        # Frame for displaying parameters about plume
         Time_frame =  tk.Frame(self, padx=0, pady=0)
         Time_frame.pack(side="top", padx=0, pady=0)
         self.time_label = tk.Label(Time_frame, text = "")
@@ -44,25 +53,51 @@ class ImageFrame(tk.LabelFrame):
         currSave_button.pack(anchor = "nw",side = "left", pady=40, padx = 20)
 
 
+
     def save_current(self):
+        """
+        DESCRIPTION:
+            Tells the experiment_controller to save the current plume image displayed.
+        """
         if self.save_current_callback:
             self.save_current_callback()
+
+
 
     def get_folder_entry(self):
         return self.folder_entry.get()
 
 
+
     def update_text(self, true_delay, flash_voltage, pulse_voltage, pulse_energy, pressure = 0, firing_delay = 0):
+        """
+        DESCRIPTION:
+            Updates the plume parameter texts for a valid measurement. 
+        """
         display_message = f"Plume lifetime: {true_delay} ns\nFlash Voltage = {flash_voltage:.3f} V \n Pressure = {pressure:.3e} mbar \n Current Pulse Voltage =  {pulse_voltage:.3f} V \n Firing Delay = {firing_delay:.2f} us \n Pulse Energy(J) = {pulse_energy}"
         self.time_label.configure(text = display_message , font = ("Roboto", 12))
 
+
+
     def update_text_invalid(self):
+        """
+        DESCRIPTION:
+            Updates the plume parameter texts for an invalid measurement. 
+        """
         self.time_label.configure(text = "INVALID" , font = ("Roboto", 12))
 
+
+
     def update_photo_display(self, image):
+        """
+        DESCRIPTION:
+            Updates the plume image display to the image just aquired.
+        """
         image_resized = self.resize_image(Image.fromarray(image))
         self.photo = ImageTk.PhotoImage(image_resized)
         self.image_label.configure(image = self.photo)
+
+
 
     def resize_image(self, image):
         """

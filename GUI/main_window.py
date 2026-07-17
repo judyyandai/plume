@@ -21,8 +21,6 @@ from GUI.frames.rs_flash_delay import RSFlashDelay
 
 from logic.objects.laser import Laser
 from logic.objects.experiment import Experiment
-from logic.objects.pulse_generator import PulseGenerator
-from logic.objects.flash_delay_series import FlashDelaySeries
 from logic.objects.data_manager import DataManager
 
 from logic.Plupy import Plupy as pl
@@ -44,8 +42,8 @@ class MainWindow(tk.Tk):
         """
         DESCRIPTION:
             Initializes the main window of the GUI, sets up the layout, and initializes necessary components.
-        CLASS ELEMENTS:
-            window: Tkinter object for the root window, must be created by tk.Tk()
+        PARAMETERS:
+            device_connections - serial connections
         """
 
         super().__init__()
@@ -60,8 +58,7 @@ class MainWindow(tk.Tk):
         self.Experiment_Frame.pack()
         self.notebook.add(self.Experiment_Frame, text = "Experiment")
 
-
-        # Creating device objects  for GUI
+        # Creating plupy device objects for GUI
         COM_ports = pl.COM_ports
         self.pirl_con, self.pg_con, self.motor_con, self.uno_con, self.teensy_con, self.vaccumMeter_con, self.heater_con, self.coherent_con = device_connections
         self.pirl = pirl(COM_ports["pirl"],  19200, serial.EIGHTBITS, serial.PARITY_NONE, serial.STOPBITS_ONE, self.pirl_con)
@@ -77,8 +74,6 @@ class MainWindow(tk.Tk):
         self.cam = thor_camera()
         self.coherent = Coherent(COM_ports["Coherent"], 19200, serial.EIGHTBITS, serial.PARITY_NONE,  serial.STOPBITS_ONE, self.coherent_con)
     
-    
-
         # Create instances of objects
         #!!! IF TIME please make this Lock() object an attriibute of hte oscilloscope class, and include 'with Lock:' on every commmunication method
         self.visa_lock = Lock()  #used for all visa comms with the oscilloscope
@@ -96,21 +91,16 @@ class MainWindow(tk.Tk):
             uno = self.uno,
             coherent = self.coherent,
             visa_lock = self.visa_lock) 
-        self.pg = PulseGenerator()
-        self.flash_delay_series = FlashDelaySeries()
+
 
         # Image frame
         self.imageFrame = ImageFrame(
             parent = self.Experiment_Frame,
             data_manager = self.dataManager)
 
-        self.experimentController = ExperimentController(experiment = self.experiment, image_frame= self.imageFrame)
-
-        #Frames
         self.laserControlFrame = LaserFrame(
             parent=self.Experiment_Frame, 
-            laser=self.laser, 
-            experiment_controller=self.experimentController,
+            laser=self.laser,
             data_manager = self.dataManager)
         
         # Create a canvas for scrollable content
@@ -163,23 +153,51 @@ class MainWindow(tk.Tk):
             parent=self.scrollbar_frame, 
             data_manager=self.dataManager, 
             motor = self.motor)
-        
- #       self.rsFlashDelayFrame = RSFlashDelay(
- #           parent = self.scrollbar_frame, 
- #           data_manager= dataManager, 
- #           pg_control_frame= self.pgControlFrame, 
- #           flash_delay_series= flash_delay_series)
 
         
+        self.rsFlashDelayFrame = RSFlashDelay(
+           parent = self.scrollbar_frame, 
+           data_manager= self.dataManager, 
+           pg_control_frame= self.pgControlFrame,
+           laser = self.laser)
+        
+        # Experiment controller to coordinate experiment object with image frame and pg frame
+        self.experimentController = ExperimentController(
+            experiment = self.experiment,
+            laser_frame = self.laserControlFrame, 
+            image_frame= self.imageFrame, 
+            pg_frame = self.pgControlFrame, 
+            rsfd_frame = self.rsFlashDelayFrame)
 
         # This line forces self.on_close to run whenever the red X is pressed on the GUI 
         self.protocol("WM_DELETE_WINDOW", self.on_close)
+
+        #!!! pirl stuff?
+        # try:
+        #     teensy_state = int(self.teensy.message("on:?")) # ask the teensy if it's on
+        # except:
+        #     teensy_state = 1
+        # if teensy_state == 1:
+        #     print("GUI Laser was on before GUI bootup")
+        #     self.laser.toggle() # make the button reflect that the laser is on
+        # elif teensy_state == 0:
+        #     pass
+        # else:
+        #     print(f"GUI confused, teensy responded to 'on?' with a number that is NOT 0 or 1. See line {inspect.currentframe().f_lineno}")
+
+        with self.visa_lock:
+            self.osc_TDS2014C.recall(9) # Recall setting 9 on TDS2014C oscilloscope
+            self.osc_TDS2014C.setup(1, 1, "MAXImum")  # Let the first measurement probe the maximum voltage value of the first channel
+        
+            self.osc_DPO2024B.recall(8) #Recall setting 8 on DPO2024B     
+
 
 
      def on_close(self):
         """
         DESCRIPTION:
-            Custom close function to ensure safe closing of the GUI software: Attempts to terminate all threads. Turns off laser. Turns off heater module.
+            Custom close function to ensure safe closing of the GUI software: Attempts to terminate all threads.
+            Turns off laser. Turns off heater module. Turns off experiment.
         """
        
         if messagebox.askokcancel("Quit", "Do you want to quit?"):
@@ -191,7 +209,7 @@ class MainWindow(tk.Tk):
                 self.heaterControlFrame.heater_toggle()
             
             if self.experiment.e_experimentOn.is_set():
-                self.experiment.toggle()
+                self.experiment.stop()
                 
                 
             #if self.F_1Hz:

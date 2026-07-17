@@ -4,10 +4,11 @@ from GUI.frames.container import ContainerFrame
 from GUI.widgets.entry_box import EntryBox
 from tkinter import messagebox
 from GUI.widgets.tool_tip import ToolTip
+from threading import Event
  
 
 class LaserFrame(ContainerFrame):
-    def __init__(self, parent, laser, experiment_controller, data_manager):
+    def __init__(self, parent, laser, data_manager):
         """
         DESCRIPTION:
             Class used to create the laser control panel which contains:
@@ -17,15 +18,23 @@ class LaserFrame(ContainerFrame):
         PARAMETERS:
             parent - (tk.Frame) the frame laser control frame is placed in
             laser - (Laser) handles the state of the laser
-            experiment - (Experiment) handles the state of the experiment
             data_manager - (dataManager) accesses and updates config.json files
         """
         super().__init__(parent, "Laser Control Panel")
         self.laser = laser
-        self.experiment_controller = experiment_controller
         self.data_manager = data_manager
 
-        
+        # event to track experiment (seperate from the one in experiment)
+        self.e_experimentOn = Event()
+
+        # callbacks to tell experiment controller to start/stop experiment
+        self.experiment_start_callback = None
+        self.experiment_stop_callback = None
+
+        # callbacks to tell rs_flash_delay frame to disable/enable button
+        self.rsfd_enable_callback = None
+        self.rsfd_disable_callback = None
+
         # Default to PIRL selected
         self.laser_option = tk.StringVar(value = "PIRL")
 
@@ -83,7 +92,6 @@ class LaserFrame(ContainerFrame):
 
         # Default to Regular pulse mode selected
         self.laser_mode =tk.StringVar(value = "Regular Pulse")
-
 
         # Regular pulse mode button
         self.rb_regPulse = tk.Radiobutton(
@@ -150,8 +158,8 @@ class LaserFrame(ContainerFrame):
         ToolTip(self.entry_shot_count.label, 'shot count')
 
 
-    # Methods for toggling objects
 
+    # Methods for toggling objects
     def laser_toggle(self):
         """
         DESCRIPTION:
@@ -161,13 +169,16 @@ class LaserFrame(ContainerFrame):
         self.update_frame()
 
 
-    def experiment_toggle(self, total_measurements = 0, mode = None):
+
+    def experiment_toggle(self):
         """
         DESCRIPTION:
             Calls toggle function on experiment object, updates GUI.
         """
-        if self.experiment_controller.experiment_is_set():
-            self.experiment_controller.stop()
+        if self.e_experimentOn.is_set():
+            if self.experiment_stop_callback:
+                self.experiment_stop_callback()
+                self.e_experimentOn.clear()
         else:
             user_entered_input_values = messagebox.askyesno(
                 title = "Input Values", 
@@ -180,13 +191,14 @@ class LaserFrame(ContainerFrame):
                     messagebox.showinfo(title = 'Invalid laser mode', message = """"Please change laser to Gallop Mode before measuring.
                                     This is the only valid laser mode for measurement.""")
                     return
-                self.experiment_controller.start(total_measurements, mode, option = self.laser.option)
+                if self.experiment_start_callback:
+                    self.experiment_start_callback(total_measurements = 0, mode = None, option = self.laser.option)
+                    self.e_experimentOn.set()
         self.update_frame()
 
 
 
     # Methods for calling change on the laser object and update GUI elements in response to the change
-
     def change_laser_option(self):
         """
         DESCRIPTION:
@@ -197,11 +209,12 @@ class LaserFrame(ContainerFrame):
         self.change_laser_mode()
     
 
+
     def change_laser_mode(self):
         """
         DESCRIPTION:
             Calls change_mode on the laser object, updates GUI. 
-            For regular pulse resets frequency to 10Hz / 100Hz for Q-Tune/pIRL, updates pulse spacing for Gallop.
+            For regular pulse resets frequency to 10Hz / 100Hz for Q-Tune / pIRL, updates pulse spacing for Gallop.
         """
         mode = self.laser_mode.get()
         self.laser.change_mode(mode)
@@ -215,6 +228,7 @@ class LaserFrame(ContainerFrame):
         self.update_frame()
     
 
+
     def change_laser_frequency(self, event):
         """
         DESCRIPTION:
@@ -222,6 +236,7 @@ class LaserFrame(ContainerFrame):
         """
         frequency = self.ddRegFreq.get()
         self.laser.change_frequency(frequency)       
+
 
 
     def change_laser_pulse_spacing(self):
@@ -237,13 +252,14 @@ class LaserFrame(ContainerFrame):
         self.laser.change_pulse_spacing(pulse_spacing)
 
 
+
     # Helper methods that update GUI elements
     def update_frame(self):
         """
         DESCRIPTION:
             Updates all the GUI elements in laser control panel
         """
-        if self.laser.e_laserOn.is_set() or self.experiment_controller.experiment_is_set():
+        if self.laser.e_laserOn.is_set() or self.e_experimentOn.is_set():
             self.disable_laser_option()
             self.disable_laser_mode()
         else:
@@ -285,12 +301,18 @@ class LaserFrame(ContainerFrame):
         """
         if self.laser.e_laserOn.is_set():
             self.b_beginMeasure.config(state="disabled")
+            if self.rsfd_disable_callback:
+                self.rsfd_disable_callback()
         else:
-            if self.experiment_controller.experiment_is_set():
+            if self.e_experimentOn.is_set():
                 self.b_startLaser.config(state="disabled")
+                if self.rsfd_disable_callback:
+                    self.rsfd_disable_callback()
             else:
                 self.b_beginMeasure.config(state="normal")
                 self.b_startLaser.config(state="normal")
+                if self.rsfd_enable_callback:
+                    self.rsfd_enable_callback()
 
 
 
@@ -301,12 +323,18 @@ class LaserFrame(ContainerFrame):
         """
         if self.laser.e_laserOn.is_set():
             self.b_beginMeasure.config(state="normal")
-            if self.experiment_controller.experiment_is_set():
-                self.b_startLaser.config(state ="disabled")             
+            if self.e_experimentOn.is_set():
+                self.b_startLaser.config(state ="disabled")    
+                if self.rsfd_disable_callback:
+                    self.rsfd_disable_callback()         
             else: 
                 self.b_startLaser.config(state="normal")
+                if self.rsfd_enable_callback:
+                    self.rsfd_enable_callback()
         else:
             self.b_beginMeasure.config(state="disabled")
+            if self.rsfd_disable_callback:
+                    self.rsfd_disable_callback()         
 
 
 
@@ -333,9 +361,10 @@ class LaserFrame(ContainerFrame):
     def update_b_beginMeasure_text(self):
         """
         DESCRIPTION:
+            ! is the "Warning: Experimental thread ending" configuration working
             Updates the text of the Begin Measuring button based on whether the experiment is running.
         """
-        if self.experiment_controller.experiment_is_set():
+        if self.e_experimentOn.is_set():
             self.b_beginMeasure.config(
                 text="Stop Experiment"
             )
@@ -362,7 +391,6 @@ class LaserFrame(ContainerFrame):
 
 
     # Helper methods for disabling/enabling panels
-
     def disable_laser_option(self):
         """
         DESCRIPTION:
@@ -421,6 +449,15 @@ class LaserFrame(ContainerFrame):
         self.ddRegFreq.config(state="enabled")
 
 
+    def disable_panel(self):
+        """
+        DESCRIPTION:
+            Disables entire frame, used when series is ran.
+        """
+        self.disable_laser_option()
+        self.disable_laser_mode()
+        self.b_beginMeasure.config(state= "disabled")
+        self.b_startLaser.config(state= "disabled")
 
 
     def create_dropdown(self, frame):
@@ -455,6 +492,7 @@ class LaserFrame(ContainerFrame):
         return dropdown
     
 
+
     def start_shot_count(self):
         """
         DESCRIPTION:
@@ -473,7 +511,7 @@ class LaserFrame(ContainerFrame):
                 title = "Shot count", 
                 message = f"Confirm requested shot count: {req_shot_count}. This will open the shutter for {req_shot_count} laser pulses."):
                 self.entry_shot_count.on_enter()
-                # message = f"shot_count:{req_shot_count}"    ->  !!! to be implemented when logic is placed
+                # message = f"shot_count:{req_shot_count}"    ->  #!!! to be implemented when logic is placed
                 # self.teensy.message(message)
                 print(f"GUI sent shot request for {req_shot_count} shots")
     

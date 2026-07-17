@@ -1,25 +1,33 @@
-2026-07-15 16:44:09,712 - DEBUG - No visa library specified, trying to find alternatives.
-2026-07-15 16:44:09,713 - DEBUG - Environment variable PYVISA_LIBRARY is unset.
-2026-07-15 16:44:09,722 - DEBUG - No user defined configuration
-2026-07-15 16:44:09,726 - DEBUG - Automatically found library files: [None, 'C:\\Windows\\system32\\visa32.dll', 'C:\\Windows\\system32\\visa32.dll', 'C:\\Windows\\system32\\visa64.dll', 'C:\\Windows\\system32\\visa64.dll']
-2026-07-15 16:44:09,727 - DEBUG - No user defined library files
-2026-07-15 16:44:09,727 - DEBUG - The IVI implementation available
-2026-07-15 16:44:09,728 - DEBUG - No user defined configuration
-2026-07-15 16:44:09,734 - DEBUG - Automatically found library files: [None, 'C:\\Windows\\system32\\visa32.dll', 'C:\\Windows\\system32\\visa32.dll', 'C:\\Windows\\system32\\visa64.dll', 'C:\\Windows\\system32\\visa64.dll']
-2026-07-15 16:44:09,735 - DEBUG - No user defined library files
-2026-07-15 16:44:09,739 - DEBUG - Library signatures: 90 ok, 0 failed
-2026-07-15 16:44:09,740 - DEBUG - Created library wrapper for C:\Windows\system32\visa32.dll
-2026-07-15 16:44:09,837 - DEBUG - viOpenDefaultRM('<ViObject object at 0x00000165869E0550>',) -> 0
-2026-07-15 16:44:09,838 - DEBUG - Created ResourceManager with session 1
-2026-07-15 16:44:11,386 - DEBUG - viParseRsrcEx(1, 'USB::0x0699::0x03A4::C015987::INSTR', 'c_ushort(7)', 'c_ushort(0)', <ctypes.c_char_Array_256 object at 0x00000165870B93D0>, <ctypes.c_char_Array_256 object at 0x00000165870B9450>, <ctypes.c_char_Array_256 object at 0x00000165870B94D0>) -> 0
-2026-07-15 16:44:11,388 - DEBUG - USB0::0x0699::0x03A4::C015987::0::INSTR - opening ...
-2026-07-15 16:44:11,418 - DEBUG - viOpen(1, 'USB0::0x0699::0x03A4::C015987::0::INSTR', <AccessModes.no_lock: 0>, 0, '<ViObject object at 0x00000165870B92D0>') -> 0
-2026-07-15 16:44:11,419 - DEBUG - USB0::0x0699::0x03A4::C015987::0::INSTR - is open with session 2
-2026-07-15 16:44:11,421 - DEBUG - viSetAttribute(2, 1073676310, <VisaBoolean.true: 1>) -> 0
-2026-07-15 16:44:11,423 - DEBUG - viSetAttribute(2, 1073676314, 5000) -> 0
-2026-07-15 16:44:11,427 - DEBUG - viParseRsrcEx(1, 'USB::0x0699::0x03A3::C031362::INSTR', 'c_ushort(7)', 'c_ushort(0)', <ctypes.c_char_Array_256 object at 0x00000165870B9B50>, <ctypes.c_char_Array_256 object at 0x00000165870B9BD0>, <ctypes.c_char_Array_256 object at 0x00000165870B9C50>) -> 0
-2026-07-15 16:44:11,429 - DEBUG - USB0::0x0699::0x03A3::C031362::0::INSTR - opening ...
-2026-07-15 16:44:11,443 - DEBUG - viOpen(1, 'USB0::0x0699::0x03A3::C031362::0::INSTR', <AccessModes.no_lock: 0>, 0, '<ViObject object at 0x00000165870B9A50>') -> 0
-2026-07-15 16:44:11,444 - DEBUG - USB0::0x0699::0x03A3::C031362::0::INSTR - is open with session 3
-2026-07-15 16:44:11,445 - DEBUG - viSetAttribute(3, 1073676310, <VisaBoolean.true: 1>) -> 0
-2026-07-15 16:44:11,446 - DEBUG - viSetAttribute(3, 1073676314, 5000) -> 0
+2026-07-17 17:19:06,156 - DEBUG - No visa library specified, trying to find alternatives.
+2026-07-17 17:19:06,156 - DEBUG - Environment variable PYVISA_LIBRARY is unset.
+2026-07-17 17:19:06,170 - DEBUG - No user defined configuration
+2026-07-17 17:19:06,175 - DEBUG - Automatically found library files: [None, 'C:\\Windows\\system32\\visa32.dll', 'C:\\Windows\\system32\\visa32.dll', 'C:\\Windows\\system32\\visa64.dll', 'C:\\Windows\\system32\\visa64.dll']
+2026-07-17 17:19:06,175 - DEBUG - No user defined library files
+2026-07-17 17:19:06,175 - DEBUG - The IVI implementation available
+2026-07-17 17:19:06,175 - DEBUG - No user defined configuration
+2026-07-17 17:19:06,180 - DEBUG - Automatically found library files: [None, 'C:\\Windows\\system32\\visa32.dll', 'C:\\Windows\\system32\\visa32.dll', 'C:\\Windows\\system32\\visa64.dll', 'C:\\Windows\\system32\\visa64.dll']
+2026-07-17 17:19:06,180 - DEBUG - No user defined library files
+2026-07-17 17:19:06,180 - DEBUG - Library signatures: 90 ok, 0 failed
+2026-07-17 17:19:06,180 - DEBUG - Created library wrapper for C:\Windows\system32\visa32.dll
+2026-07-17 17:19:06,297 - DEBUG - viOpenDefaultRM('<ViObject object at 0x00000154357CC950>',) -> 0
+2026-07-17 17:19:06,297 - DEBUG - Created ResourceManager with session 1
+2026-07-17 17:19:07,791 - DEBUG - viParseRsrcEx(1, 'USB::0x0699::0x03A4::C015987::INSTR', 'c_ushort(7)', 'c_ushort(0)', <ctypes.c_char_Array_256 object at 0x0000015435E2D6D0>, <ctypes.c_char_Array_256 object at 0x0000015435E2D750>, <ctypes.c_char_Array_256 object at 0x0000015435E2D7D0>) -> 0
+2026-07-17 17:19:07,791 - DEBUG - USB0::0x0699::0x03A4::C015987::0::INSTR - opening ...
+2026-07-17 17:19:07,821 - DEBUG - viOpen(1, 'USB0::0x0699::0x03A4::C015987::0::INSTR', <AccessModes.no_lock: 0>, 0, '<ViObject object at 0x0000015435E2D5D0>') -> 0
+2026-07-17 17:19:07,821 - DEBUG - USB0::0x0699::0x03A4::C015987::0::INSTR - is open with session 2
+2026-07-17 17:19:07,831 - DEBUG - viSetAttribute(2, 1073676310, <VisaBoolean.true: 1>) -> 0
+2026-07-17 17:19:07,831 - DEBUG - viSetAttribute(2, 1073676314, 5000) -> 0
+2026-07-17 17:19:07,831 - DEBUG - viParseRsrcEx(1, 'USB::0x0699::0x03A3::C031362::INSTR', 'c_ushort(7)', 'c_ushort(0)', <ctypes.c_char_Array_256 object at 0x0000015435E2DE50>, <ctypes.c_char_Array_256 object at 0x0000015435E2DED0>, <ctypes.c_char_Array_256 object at 0x0000015435E2DF50>) -> 0
+2026-07-17 17:19:07,831 - DEBUG - USB0::0x0699::0x03A3::C031362::0::INSTR - opening ...
+2026-07-17 17:19:07,851 - DEBUG - viOpen(1, 'USB0::0x0699::0x03A3::C031362::0::INSTR', <AccessModes.no_lock: 0>, 0, '<ViObject object at 0x0000015435E2DD50>') -> 0
+2026-07-17 17:19:07,851 - DEBUG - USB0::0x0699::0x03A3::C031362::0::INSTR - is open with session 3
+2026-07-17 17:19:07,851 - DEBUG - viSetAttribute(3, 1073676310, <VisaBoolean.true: 1>) -> 0
+2026-07-17 17:19:07,851 - DEBUG - viSetAttribute(3, 1073676314, 5000) -> 0
+2026-07-17 17:19:15,456 - DEBUG - viWrite(2, b'RECALL:SETUP 9\r\n', 16, 'c_ulong(16)') -> 0
+2026-07-17 17:19:15,459 - DEBUG - viWrite(2, b'MEASUrement:MEAS1:SOUrce CH1\r\n', 30, 'c_ulong(30)') -> 0
+2026-07-17 17:19:15,501 - DEBUG - viWrite(2, b'MEASUrement:MEAS1:TYPE MAXImum\r\n', 32, 'c_ulong(32)') -> 0
+2026-07-17 17:19:15,501 - DEBUG - viWrite(3, b'RECALL:SETUP 8\r\n', 16, 'c_ulong(16)') -> 0
+2026-07-17 17:20:45,790 - DEBUG - viWrite(2, b'RECALL:SETUP 9\r\n', 16, 'c_ulong(16)') -> 0
+2026-07-17 17:20:45,800 - DEBUG - viWrite(2, b'MEASUrement:MEAS1:SOUrce CH1\r\n', 30, 'c_ulong(30)') -> 0
+2026-07-17 17:20:45,839 - DEBUG - viWrite(2, b'MEASUrement:MEAS1:TYPE MAXImum\r\n', 32, 'c_ulong(32)') -> 0
+2026-07-17 17:20:45,845 - DEBUG - viWrite(3, b'RECALL:SETUP 8\r\n', 16, 'c_ulong(16)') -> 0

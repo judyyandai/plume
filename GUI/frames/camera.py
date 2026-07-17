@@ -1,5 +1,3 @@
-# Frame for camera settings
-
 from GUI.frames.container import ContainerFrame
 from GUI.widgets.entry_box import EntryBox
 from GUI.widgets.tool_tip import ToolTip
@@ -14,6 +12,7 @@ class CameraFrame(ContainerFrame):
         PARAMETERS:
             parent - (tk.Frame) the frame this frame is placed in
             data_manager - (dataManager) accesses and updates config.json files
+            experiment - (Experiment) the experiment the camera is used in
         """
         super().__init__(parent, "Thor Labs Camera")
 

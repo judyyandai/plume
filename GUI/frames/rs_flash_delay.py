@@ -2,14 +2,22 @@ from GUI.frames.container import ContainerFrame
 from GUI.widgets.entry_box import EntryBox
 from GUI.widgets.tool_tip import ToolTip
 import tkinter as tk
+from threading import Event
+from tkinter import messagebox
 
 class RSFlashDelay(ContainerFrame):
-    def __init__(self, parent, data_manager, pg_control_frame, flash_delay_series):
+    def __init__(self, parent, data_manager, pg_control_frame, laser):
         super().__init__(parent, "Run Series: Vary Flash Delay")
 
         self.data_manager = data_manager
         self.pg_control_frame = pg_control_frame
-        self.flash_delay_series = flash_delay_series
+        self.laser = laser
+
+        # calls experiment controller to start series
+        self.rsfd_start_callback = None
+        self.rsfd_stop_callback = None
+
+        self.e_rsfdOn = Event()
 
         ToolTip(self, "series flash delay")
 
@@ -33,7 +41,7 @@ class RSFlashDelay(ContainerFrame):
         self.L_flash_num_measurements.pack(side = tk.LEFT)
         self.V_flash_num_measurements = tk.IntVar()
         self.update_flash_measurement_count()
-        #self.b_series.config(state = 'disabled')
+        self.b_series.config(state = 'disabled')
 
 
 
@@ -66,6 +74,7 @@ class RSFlashDelay(ContainerFrame):
         RETURN:
             None
         """
+
         # Sets parameters to whatever is in the text bar
         self.start_delay_us.on_enter()
         self.stop_delay_us.on_enter()
@@ -73,7 +82,6 @@ class RSFlashDelay(ContainerFrame):
         self.meas_per_delay.on_enter()
         
         #set_params
-        self.flash_delay_series.set_V_times_run(0)
         total_measurements = self.V_flash_num_measurements.get()
         print('total measurements:', total_measurements)
         
@@ -81,7 +89,31 @@ class RSFlashDelay(ContainerFrame):
         self.pg_control_frame.entry_FlashDelay.entry.insert(0,self.data_manager.V_start_delay_us.get())
         self.data_manager.V_FlashDelay_us.set(self.data_manager.V_start_delay_us.get()) 
         
-        self.b_series.config(text ="Running flash delay series.", fg = "red")
-        self.flash_delay_series.toggle() 
-        
+        if not self.e_rsfdOn.is_set():
+            user_entered_input_values = messagebox.askyesno(
+                title = "Input Values", 
+                message = "Have you chosen an appropriate file path & entered values under 'Input Values'? These are inmportant if you want to save your files!")
+            user_closed_shutter = messagebox.askyesno(
+                title = "Shutter Reminder", 
+                message="Make sure to close the shutter before proceeding! The pulses will fire correctly only if the shutter is closed.")
+            if user_entered_input_values and user_closed_shutter:
+                if self.laser.mode == "Regular Pulse":
+                    messagebox.showinfo(title = 'Invalid laser mode', message = """"Please change laser to Gallop Mode before measuring.
+                                    This is the only valid laser mode for measurement.""")
+                    return
+                self.e_rsfdOn.set()
+                if self.rsfd_start_callback:
+                    self.rsfd_start_callback(total_measurements = total_measurements, mode = "rs", option = self.laser.option) 
+                self.b_series.config(text ="Running flash delay series \nClick to STOP", fg = "red")
+        else:
+            self.e_rsfdOn.clear()
+            if self.rsfd_stop_callback:
+                self.rsfd_stop_callback()
+            self.b_series.config(text = "Run Series Measurement", fg = "black")
+
         return
+    
+
+
+    def done(self):
+        self.b_series.config(text = "Run Series Measurement", fg = "black")

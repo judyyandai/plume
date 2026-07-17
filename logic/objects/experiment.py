@@ -1,4 +1,4 @@
-from threading import Event, Thread, Lock
+from threading import Event, Thread
 import threading
 import time
 import numpy as np
@@ -7,7 +7,6 @@ from logic.Plupy.image import image as pl_img
 import logic.devices.pyCurlModel as qTune
 import os
 import logic.Plupy.Plupy as pl
-
 
 class Experiment:
     def __init__(self, vacuum_meter, data_manager, pg, teensy, osc_TDS2014C, osc_DPO2024B, cam, uno, coherent, visa_lock):
@@ -23,12 +22,15 @@ class Experiment:
         self.E_cam = Event()
         self.E_valid = Event()
 
+        # Call backs to experiment controllers for updating image frame
         self.image_callback = None
         self.text_callback = None
         self.text_callback_invalid = None
+        self.flash_delay_callback = None
+        self.rsfd_done_callback = None
 
         self.vacuumMeter = vacuum_meter
-        self.dataManager = data_manager
+        self.data_manager = data_manager
         self.pg = pg
         self.teensy = teensy
         self.osc_TDS2014C = osc_TDS2014C
@@ -37,6 +39,7 @@ class Experiment:
         self.uno = uno
         self.coherent = coherent
         self.visa_lock = visa_lock
+
 
 
     def start(self, total_measurements, mode, option, folder):
@@ -49,6 +52,7 @@ class Experiment:
             mode: Defaults to None. If "rs" then run flash delay series. If "ps" run power series.
             folder: file path to save data to
         """
+        self.e_experimentOn.set()
         self.T_Pressure = Thread(target=self.vaccum_monitoring, name = "T_Pressure")
         self.T_Pressure.start()
     
@@ -57,11 +61,19 @@ class Experiment:
 
 
 
+    def stop(self):
+        """
+        DESCRIPTION:
+            Clears the experiment on event.
+        """
+        self.e_experimentOn.clear()
+
+
+
     def vaccum_monitoring(self):
         """
         DESCRIPTION:
             Target function of the T_Pressure thread. Continuously read the pressure inside the vacuum chamber until the experimental thread flag is off.
-
         """
         while self.e_experimentOn.is_set():
             try:
@@ -71,10 +83,11 @@ class Experiment:
 
 
 
-    def experiment(self, option, folder, total_measurements = 0, mode = None):
+    def experiment(self, option, folder, total_measurements, mode):
         """
         DESCRIPTION:
-            Target function of the T_Experiment thread. Triggers Arduino Uno, which then starts TDC and starts Teensy measure mode. Pulse generator triggers flash lamp and camera. 
+            Target function of the T_Experiment thread. Triggers Arduino Uno, which then starts TDC and starts Teensy measure method. 
+            Pulse generator triggers flash lamp and camera. 
         PARAMETERS
             option: one of 'Q-Tune" or "PIRL"
             total_measurements: Defaults to 0. If nonzero, then one of the run series options may run.
@@ -82,16 +95,19 @@ class Experiment:
             folder: file path to save data to
         """
         print("Setting up devices for experiment.")
-        current_prepulse_mode = self.flash_camera_power_setup(option)
         self.experiment_setup(option, folder)
+        current_prepulse_mode = self.flash_camera_power_setup(option)
         i=0
+        # for run series
+        V_times_run = 0
 
         #######################################################
         while self.e_experimentOn.is_set():
             i+=1
             print(f"loop: {i}") 
-         
             a=time.time()
+            self.flashdelay_s = self.data_manager.V_FlashDelay_us.get() *10**(-6)
+            self.pg.setup(self.flashdelay_s, current_prepulse_mode, 27, option)  # this is for run series to update the flash_delay
             image = np.zeros((2448,2048), dtype=np.uint16) # creating a zero array with dimensions of the image - passed to camera thread.
             # new image buffer is copied into here. 
             # Doing it this way 'allows the camera thread update variable value in this thread without pausing execution'
@@ -115,13 +131,34 @@ class Experiment:
             print("run time: " +str(b-a))
 
             #!!! stuff for run series
+            if total_measurements != 0:
+                V_times_run += 1
+                
+                # Run series mode
+                # It essentially change the flash delay after a set amount of 
+                # measurments. The starting and ending delays are set by the 
+                # user. Stop the experimental thread after all measurments
+                # finish.
+                if mode == "rs":
+                    if V_times_run < total_measurements:
+                    
+                        if V_times_run % self.data_manager.V_meas_per_delay.get() == 0 and not V_times_run == 0:
+                            delay_new = self.data_manager.V_start_delay_us.get() + (V_times_run/self.data_manager.V_meas_per_delay.get()) * self.data_manager.V_interval_us.get()
+                            print('new delay:', delay_new)
+                            if self.flash_delay_callback:
+                                self.flash_delay_callback(delay_new)
+                    else:
+                        self.stop()
+                        if self.rsfd_done_callback:
+                            self.rsfd_done_callback()
 
         # Disarm the camera when the experimental thread ends
         self.cam.camera.disarm() 
         self.cam.close_camera()
 
         # Put Q-Tune back into internal triggering
-        qTune.gallopModeInternal()  
+        if option == "Q-Tune":
+            qTune.gallopModeInternal()  
         
         # With the experimental thread ended, the user can choose to start experiment again
         print("Experimental thread ended.")
@@ -177,7 +214,7 @@ class Experiment:
         self.laser = option
         #self.curr_firing_delay = firing_delay
 
-        if self.dataManager.V_save.get():# if save button pressed
+        if self.data_manager.V_save.get():# if save button pressed
                     # Wait until the image buffer is copied onto the local 
                     # image variable
                     # Start a transisent camera thread
@@ -238,10 +275,10 @@ class Experiment:
             current_prepulse_mode - true (prepulse) or false (no prepulse) 
             image - zero array created to copy image buffer into
         """
-        self.flash_delay_s = self.dataManager.V_FlashDelay_us.get() *10**(-6)# Get flash delay in config file
+        self.flash_delay_s = self.data_manager.V_FlashDelay_us.get() *10**(-6)# Get flash delay in config file
 
         if self.E_cam.is_set(): # Checking if some of the settings changed with the camera and updating it
-            gain = self.dataManager.V_CamGain.get()
+            gain = self.data_manager.V_CamGain.get()
             self.cam.change_gain(gain)
             self.E_cam.clear()
             print("GUI Camera gain set and event cleared.")
@@ -264,7 +301,7 @@ class Experiment:
     def experiment_setup(self, option, folder):
         """
         DESCRIPTION:
-            Switches Q-Tune to external triggering, waits 10 seconds updates folder and config file.
+            Switches Q-Tune to external triggering, waits 10 seconds, updates folder and config file.
         PARAMETERS:
             option - "PIRL" or "Q-Tune"
             folder: file path to save data to
@@ -279,7 +316,7 @@ class Experiment:
             print(".", end = "")
         print("")
         self.folder = folder
-        self.dataManager.update_config_file()
+        self.data_manager.update_config_file()
         print("Setup complete, starting Experiment loop")
 
 
@@ -287,7 +324,7 @@ class Experiment:
     def save_current(self):
         """
         DESCRIPTION:
-            Creates T_SavingCurrent thread that runs self.saving() function to save images as they are taken.  
+            Creates T_SavingCurrent thread that runs self.saving() function to save a particular image.  
         """
         HandPickedFolder = os.path.join(self.folder,"handpicked")
         os.makedirs(HandPickedFolder, exist_ok=True)
@@ -308,10 +345,6 @@ class Experiment:
 
 
     def saving(self, folder, delay_true, delay_set, image, voltage, p_voltage, isPrePulse, laser, firingDelay = 0):
-        #A thread function that save the data currently display on the GUI
-        # self.ImageFolder = self.ImageFolder_entry.get()
-        # self.DataFolder = self.DataFolder_entry.get()
-        
         """
         DESCRIPTION:
             Target function of the thread T_SavingCurrent. 
@@ -336,9 +369,9 @@ class Experiment:
             os.makedirs(DataFolder, exist_ok=True)
             
             filename = pl.get_file_name(delay_set, delay_true)
-            q1c = self.dataManager.V_q1c.get()
-            lens = self.dataManager.V_lens.get()
-            lens_height = self.dataManager.V_lens_height.get()
+            q1c = self.data_manager.V_q1c.get()
+            lens = self.data_manager.V_lens.get()
+            lens_height = self.data_manager.V_lens_height.get()
             #pressure = self.pressure
             with open(DataFolder + "/" + filename + ".csv", "w") as file:
                 file.write("Set Delay(ns), True Delay(ns), Voltage(V), q1c, lens focal length(mm), lens height(mm), pressure(mbar), Pulse Voltage (V), Prepulse, Firing Delay, Laser")
@@ -375,12 +408,12 @@ class Experiment:
             current_prepulse_mode: Boolean whether we are in prepulse mode or not
         """
         exposure = 27
-        self.flashdelay_s = self.dataManager.V_FlashDelay_us.get() *10**(-6) # reading and converting to seconds
-        current_prepulse_mode = self.dataManager.V_PrePulse.get() 
+        self.flashdelay_s = self.data_manager.V_FlashDelay_us.get() *10**(-6) # reading and converting to seconds
+        current_prepulse_mode = self.data_manager.V_PrePulse.get() 
         self.pg.setup(self.flashdelay_s, current_prepulse_mode, exposure, option)
 
         if option == "PIRL":
-            DelayBetweenTriggers = self.dataManager.V_DelayBetweenTriggers.get( ) # Setting the delay between Q2&Q3 trigger and uc laser trigger
+            DelayBetweenTriggers = self.data_manager.V_DelayBetweenTriggers.get( ) # Setting the delay between Q2&Q3 trigger and uc laser trigger
             self.teensy.delayBetweenTriggers(DelayBetweenTriggers) 
             
             with self.visa_lock:
@@ -388,8 +421,8 @@ class Experiment:
                 self.osc_TDS2014C.setup(1, 1, "MAXImum")  # Let the first measurement probe the maximum voltage value of the first channel
 
                 self.osc_DPO2024B.recall(8) #Recall setting 8 on DPO2024B       
-        self.q1c_now = self.dataManager.V_q1c.get() # store the current q1c value
-        gain = self.dataManager.V_CamGain.get() # camera gain
+        self.q1c_now = self.data_manager.V_q1c.get() # store the current q1c value
+        gain = self.data_manager.V_CamGain.get() # camera gain
         
         self.cam.set_params(exposure, gain, 1, 1)
         self.cam.arm_camera()

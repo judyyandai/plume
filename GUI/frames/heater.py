@@ -9,14 +9,14 @@ from GUI.widgets.tool_tip import ToolTip
 class HeatingFrame(ContainerFrame):
     def __init__(self, parent, heater, data_manager):
         """
-        ! contains some logic
         DESCRIPTION:
             Class used to create the heating control panel which contains:
                 - turn on/off button
                 - entry boxes for Kp, Ki, Kd
+            And handles some logic with starting a thread to monitor the heater.
         PARAMETERS:
             parent - (tk.Frame) the frame heating control frame is placed in
-            heater - (Heater) handles the state of the heater
+            heater - (heater) plupy object that handles the state of the heater
             data_manager - (dataManager) accesses and updates config.json files
         """
         super().__init__(parent, "PID Heater Control Panel")
@@ -64,10 +64,12 @@ class HeatingFrame(ContainerFrame):
 
         self.entry_Kd.disable()
     
+
+
     def heater_toggle(self):
         """
         DESCRIPTION:
-            Calls toggle function on heater and updates GUI.
+            Calls start or stop on the heater object and updates GUI.
         """
         self.e_heaterOn.set() if not self.e_heaterOn.is_set() else self.e_heaterOn.clear()
 
@@ -78,6 +80,8 @@ class HeatingFrame(ContainerFrame):
 
         self.update_b_pidOnOff()
     
+
+
     def update_b_pidOnOff(self):
         """
         DESCRIPTION:
@@ -99,6 +103,8 @@ class HeatingFrame(ContainerFrame):
         self.entry_Kp.on_enter() 
         self.heater.set_coeff("Kp", self.data_manager.V_Kp.get())
 
+
+
     def set_Ki(self):
         """
         DESCRIPTION:
@@ -107,6 +113,8 @@ class HeatingFrame(ContainerFrame):
         """
         self.entry_Ki.on_enter() 
         self.heater.set_coeff("Ki", self.data_manager.V_Ki.get())
+
+
 
     def set_Kd(self):
         """
@@ -118,13 +126,13 @@ class HeatingFrame(ContainerFrame):
         self.heater.set_coeff("Kd", self.data_manager.V_Kd.get())
 
 
+
     def set_target_temp(self, suppress_popup = False):
         """
         DESCRIPTION:
             Send new target temperature to the heater object. First check that it is not above the max alloweable temperature, and confirm with the user. 
         PARAMETERS
-            suppress_popup: Defaults to False. If True, there will be no pop-up asking to confirm target_temp.
-            
+            suppress_popup: Defaults to False. If True, there will be no pop-up asking to confirm target_temp.    
         """
         old_val = self.data_manager.V_target_temp_C.get()
         if not suppress_popup:
@@ -145,16 +153,12 @@ class HeatingFrame(ContainerFrame):
             print(f"Error in GUI.set_target_temp: {e}. Likely invalid input. ")
 
 
+
     def check_heater(self):
         """
         ! PROBLEM: This function is having trouble exiting when we boot down the GUI.S
         DESCRIPTION:
-            Polls the heater via serial communication, and then updates the GUI display to show these temperatures.
-        PARAMETERS
-            None.
-        RETURN: 
-            None.
-            
+            Polls the heater via serial communication, and then updates the GUI display to show these temperatures.      
         """
         i = 0 # for debugging. 
         while self.e_checkHeater.is_set():
@@ -183,12 +187,18 @@ class HeatingFrame(ContainerFrame):
             time.sleep(0.05)
         print("exiting check_heater now!")
         return
-    
+
+
+
     def close_check_heater(self):
-            if hasattr(self, "T_check_heater") and self.T_check_heater.is_alive():
-                print("Waiting for heater thread to close . . ")
-                self.T_check_heater.join(timeout = 5)
-                if self.T_check_heater.is_alive():
-                    print("T_check_heater did not exit in time!")
-                else:
-                    print("T_check_heater successfully closed")  
+        """
+        DESCRIPTION:
+            Closes the T_check_heater thread.
+        """
+        if hasattr(self, "T_check_heater") and self.T_check_heater.is_alive():
+            print("Waiting for heater thread to close . . ")
+            self.T_check_heater.join(timeout = 5)
+            if self.T_check_heater.is_alive():
+                print("T_check_heater did not exit in time!")
+            else:
+                print("T_check_heater successfully closed")  

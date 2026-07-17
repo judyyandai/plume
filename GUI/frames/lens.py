@@ -9,8 +9,7 @@ class LensFrame(ContainerFrame):
     def __init__(self, parent, data_manager):
         """
         DESCRIPTION:
-            Class used to create the folder panel which contains:
-                - folder entry
+            Class used to create the lens panel which contains:
                 - lens focal length and height entry
         PARAMETERS:
             parent - (tk.Frame) the frame this frame is placed in
@@ -20,9 +19,7 @@ class LensFrame(ContainerFrame):
 
         self.data_manager = data_manager
 
-
         # Make Entry Boxes
-
         self.entry_focal_length = EntryBox(frame = self, 
                                      label_text = "Lens focal length [mm]", 
                                      variable = self.data_manager.V_lens, 
@@ -39,6 +36,8 @@ class LensFrame(ContainerFrame):
         ToolTip(self.entry_lens_height.label, "lens height")
         ToolTip(self.entry_focal_length.label, "focal length")
         
+
+
     def set_lens_focal_length(self):
         """
         DESCRIPTION:
@@ -46,6 +45,8 @@ class LensFrame(ContainerFrame):
         """
         self.entry_focal_length.on_enter()
         print(f"Lens focal length set to {self.data_manager.V_lens}mm")
+
+
 
     def set_lens_height(self):
         """
