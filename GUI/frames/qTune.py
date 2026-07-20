@@ -13,6 +13,7 @@ class QTuneFrame(ContainerFrame):
             laser - (Laser) handles the state of the laser
         """
         super().__init__(parent, 'Q-Tune')
+
         self.parent = parent
         self.data_manager = data_manager
         self.laser = laser
@@ -20,6 +21,7 @@ class QTuneFrame(ContainerFrame):
         self.entry_qTune_wavelength = EntryBox(self, "Q-Tune Wavelength (nm)", self.data_manager.V_qTune_wavelength, self.data_manager, self.set_qTune_wavelength)
         self.entry_qTune_pump = EntryBox(self, "OPO Pump Energy Level (%)", self.data_manager.V_qTune_pump, self.data_manager, self.set_qTune_pump)
         # !!! tool tip
+
 
 
     def set_qTune_wavelength(self):
@@ -33,13 +35,13 @@ class QTuneFrame(ContainerFrame):
         self.laser.change_qTune_wavelength(qTune_wavelength)
         
 
+
     def set_qTune_pump(self):
         """
         DESCRIPTION:
             Updates the OPO Pump Energy Level from the entry box, and calls the change on the laser object.
 
         """
-        
         self.entry_qTune_pump.on_enter()
         qTune_pump = self.data_manager.V_qTune_pump.get()
         self.laser.change_qTune_pump(qTune_pump)

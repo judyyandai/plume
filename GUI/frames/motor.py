@@ -16,7 +16,7 @@ class MotorFrame(ContainerFrame):
         PARAMETERS:
             parent - (tk.Frame) the frame this frame is placed in
             data_manager - (dataManager) accesses and updates config.json files
-            motor - (Motor) object that handles the state of the motor
+            motor - (motor) plupy object that handles the state of the motor
         """
         super().__init__(parent, "Motor Control Panel")
         
@@ -28,7 +28,7 @@ class MotorFrame(ContainerFrame):
         self.step_frame = tk.Frame(self)
         self.step_frame.grid(row=0, column=6, padx=5, pady=0)
 
-        self.entry_MotorStepDistance = EntryBox(self.step_frame, "Distance [mm]", self.data_manager.V_MotorStepDistance, self.data_manager, self.motor_setup)
+        self.entry_MotorStepDistance = EntryBox(self.step_frame, "Increments [mm]", self.data_manager.V_MotorStepDistance, self.data_manager, self.motor_setup)
         ToolTip(self.entry_MotorStepDistance.label, "motor distance")
 
         # position_label_text is the text that gets displayed on the label; doing it this way updates the label dynamically
@@ -46,11 +46,10 @@ class MotorFrame(ContainerFrame):
                                   f"\nCURRENT SAFE MAX AND MIN VALUES ARE" 
                                   f"\nX={self.data_manager.max_x}mm, X={self.data_manager.min_x}mm, Y={self.data_manager.max_y}mm, Y={self.data_manager.min_y}mm")
         tk.Label(position_description_frame, text=position_description,  font = "Roboto 10", justify = "left", wraplength = 300).pack(fill = "x", padx = 2, pady = 2)
-        # Info hover button
 
+        # Info hover button
         hover_button_frame = tk.Frame(self)
         hover_button_frame.grid(row=4, column=6, padx=5, pady=5)
-        
 
         recentering_instruction = tk.Label(hover_button_frame, text="Recentering Instructions (rightclick) ℹ️ ", fg = "blue", font=("Arial", 11))
         recentering_instruction.pack(padx = 2, pady = 2)
@@ -66,6 +65,7 @@ class MotorFrame(ContainerFrame):
         self.motor_pictures(self)
 
 
+
     def motor_setup(self):
         """
         DESCRIPTION:
@@ -74,15 +74,15 @@ class MotorFrame(ContainerFrame):
         self.entry_MotorStepDistance.on_enter()
 
 
+
     def move_motor_with_limits(self, sign, direction):
         """
         DESCRIPTION:
-            Move the motor in the desired direction. Updates and saves the motors current position, and ensures it doesn't exceed
+            Tells the motor object to move in the desired direction. Updates and saves the motors current position, and ensures it doesn't exceed
             its max and min movement range for both the x and y directions.
         PARAMETERS
             sign: integer must be -1 for negative directions (left & down) or +1 for positive directions (right & up)
             direction: string. "x" or "y" are valid.
-
         """
         try:
             dist = self.data_manager.V_MotorStepDistance.get()
@@ -142,13 +142,14 @@ class MotorFrame(ContainerFrame):
             print("Invalid input. Please enter a valid number.")
 
 
+
     def motor_up(self):
         """
         DESCRIPTION:
             Move the motor towards the camera by a predefined amount.
-
         """
         self.move_motor_with_limits(1, 'y')
+
 
     def motor_down(self):
         """
@@ -157,6 +158,7 @@ class MotorFrame(ContainerFrame):
         """
         self.move_motor_with_limits(-1, 'y')
     
+
     def motor_left(self):
         """
         DESCRIPTION:
@@ -172,6 +174,7 @@ class MotorFrame(ContainerFrame):
         """
         self.move_motor_with_limits(1, 'x')       
         
+
 
     def create_button(self, frame, label_text, position, command):
         """
@@ -190,6 +193,7 @@ class MotorFrame(ContainerFrame):
         # Creating Button
         Button = tk.Button(button_frame, text=label_text, command=command)
         Button.grid(row=0, column=0, padx=5, pady=5)
+
 
 
     def motor_pictures(self, Motor_frame):

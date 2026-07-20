@@ -83,10 +83,6 @@ class DataManager:
         """
         DESCRIPTION:
             .get() on every tkinter variable we want to save and set it to it's respective json value in the class variable. Then, write this to the config.json file. 
-        PARAMETERS:
-            None
-        RETURN:
-            None.
         """
         # get every variable and set it to the self.config_json. Then write this c
         self.config_json['save'] = self.V_save.get()
