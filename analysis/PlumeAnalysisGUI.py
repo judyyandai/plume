@@ -337,6 +337,7 @@ def takeAverageResult(plumes, category, meanParam, increment):
         if returnIsMeasurable(meanParam):
             meanParam = f"{meanParam} ({returnUnits(meanParam)})"
         df = pd.DataFrame({category: plumeCategorizedParams, meanParam: plumeMeanParams})
+        print(df)
         return df.groupby([category], sort=False).describe()
     except:
         messagebox.showerror(title="Increment too small", message="Increment you chose is too small for this parameter. This will fill up the screen.")
@@ -1272,11 +1273,13 @@ def checkForBooleanStat(stat, column, dependentText, count, tempTopStat):
     if not returnIsMeasurable(dependentText):
         isBoolean = True
     if column == "top" and isBoolean:
-        if (stat == "1"):
+        print("top accessed")
+        if stat == "1":
             stat = f"{dependentText}"
-        elif (stat == "0"):
+        elif stat == "0":
             stat = f"Not {dependentText}"
     elif column == "freq" and isBoolean:
+        print("freq accessed")
         stat = float(stat)
         count = float(count)
         if tempTopStat: 
@@ -1284,10 +1287,12 @@ def checkForBooleanStat(stat, column, dependentText, count, tempTopStat):
         else:
             percent = 100*(1-(stat/count))
         stat = f"{percent:.3g}%"
+    else:
+        print("nothing accessed")
     return stat
 
 # INPUT: Data Table, String, String
-# PURPOSE: Recereate a data table onto a Tk window
+# PURPOSE: Recreate a data table onto a Tk window
 # OUTPUT: None
 def tableResult(result,x,y):
     #print(result) - Use for debugging 

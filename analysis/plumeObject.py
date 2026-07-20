@@ -41,7 +41,7 @@ class Plume:
         # print(voltage)
 
         # Default to "PIRL" if the column is missing or empty (for handling older csv files)
-        laser = dataRow[8].strip() if len(dataRow) > 8 and dataRow[8].strip() else "PIRL"
+        laser = dataRow[10].strip() if len(dataRow) > 10 and dataRow[10].strip() else "PIRL"
         # print(laser)
 
         return lifeTime, voltage, laser
@@ -80,6 +80,9 @@ class Plume:
     
     def getIsPerfect(self):
         return self.isPerfect
+    
+    def getLaser(self):
+        return self.laser
     
     # Setters - also not necessary but also don't exclude
     def setName(self, name: str):

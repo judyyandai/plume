@@ -983,7 +983,8 @@ def getParams(plume):
     isPerfect = plume.getIsPerfect()
     isFracture = plume.getIsFracture()
     fractureRadius = plume.getFractureRadius()
-    return name, directory, imageDirectory, lifetime, voltage, isLiftOff, jetLength, isPerfect, isFracture, fractureRadius
+    laser = plume.getLaser()
+    return name, directory, imageDirectory, lifetime, voltage, isLiftOff, jetLength, isPerfect, isFracture, fractureRadius, laser
 
 # INPUT: Plume, Boolean
 # PURPOSE: Gets parameters of the plume that are obtained within the image and are not saved as a parameter
@@ -1029,14 +1030,14 @@ def savePlumeImageIntoDirectory(folderTag,
 # Float, String, Float, Float, Boolean, Boolean, Integer, List of Integer, List of Integer, List of Integer
 # PURPOSE: Writes down the Plume's parameters into a csv file and saves it into a specified folderTag
 # OUTPUT: None
-def savePlumeIntoDirectory(folderTag, fileName, directory, setDelay,lifetime,voltage,q1c,lensFocalLength,lensHeight,pressure,pulse_voltage, jetLength, fractureRadius,text, height, width,isHeightValid, isWidthValid, intersect_count,
+def savePlumeIntoDirectory(folderTag, fileName, directory, setDelay,lifetime,voltage,q1c,lensFocalLength,lensHeight,pressure,pulse_voltage, jetLength, fractureRadius, laser,text, height, width,isHeightValid, isWidthValid, intersect_count,
                                idl_90, idl_85, idl_80):
     fileName = fileName.split(".")[0]
     os.makedirs(os.path.join(directory,folderTag), exist_ok=True)
     with open(os.path.join(directory,folderTag,fileName+".csv"), mode="w", newline="") as file:
         writer = csv.writer(file)
-        writer.writerow(["Set Delay(ns)" ,"True Delay(ns)",	 "Voltage(V)",	 "q1c",	 "lens focal length(mm)",	 "lens height(mm)",	 "pressure(mbar)",	 "Pulse Voltage (V)", "Jet Length (um)", "Fracture Radius (um)"])
-        writer.writerow([setDelay,lifetime,voltage,q1c,lensFocalLength,lensHeight,pressure,pulse_voltage, jetLength, fractureRadius])
+        writer.writerow(["Set Delay(ns)" ,"True Delay(ns)",	 "Voltage(V)",	 "q1c",	 "lens focal length(mm)",	 "lens height(mm)",	 "pressure(mbar)",	 "Pulse Voltage (V)", "Jet Length (um)", "Fracture Radius (um)", "Laser"])
+        writer.writerow([setDelay,lifetime,voltage,q1c,lensFocalLength,lensHeight,pressure,pulse_voltage, jetLength, fractureRadius, laser])
         writer.writerow(["State", "Height", "Width","Height Valid", "Width Valid","Intersect Count"])  # This adds a new row
         writer.writerow([text, height, width,isHeightValid, isWidthValid, intersect_count])  # This adds a new row
         writer.writerow(["Intersect Distance List (90% Height)"])  # This adds a new row
@@ -1073,7 +1074,7 @@ def createAnalysis(plumes, skipContours = True, evaluateLiftOff = False, evaluat
         print("progress: " + str(((current_index + 1)/total_count)*100) + "%")
         #make its own method
         #Plume object params
-        name, directory, imageDirectory, lifetime, voltage, isLiftOff, jetLength, isPerfect, isFracture, fractureRadius = getParams(plume)
+        name, directory, imageDirectory, lifetime, voltage, isLiftOff, jetLength, isPerfect, isFracture, fractureRadius, laser = getParams(plume)
         # Derived Params
         bubble_image_contour, contours, base_height_y, overall_highest, in_highest, plumeWidth50_left, plumeWidth50_right = deriveParams(plume)
         # Validity
@@ -1191,6 +1192,14 @@ def createAnalysis(plumes, skipContours = True, evaluateLiftOff = False, evaluat
             thickness,
             lineType)
         
+        cv2.putText(bubble_image_contour,"Laser = " + laser,
+            (10,text_height +240), 
+            font, 
+            fontScale,
+            fontColor,
+            thickness,
+            lineType)
+        
         #If the plume is found to have liftOffs, then display a text saying that a liftoff is present
         #make its own method
         if isLiftOff:
@@ -1220,7 +1229,7 @@ def createAnalysis(plumes, skipContours = True, evaluateLiftOff = False, evaluat
             # lineType)
 
             savePlumeIntoDirectory("lift_off_data", name, directory,
-                                    setDelay,lifetime,voltage,q1c,lensFocalLength,lensHeight,pressure, pulse_voltage, jetLength, fractureRadius,
+                                    setDelay,lifetime,voltage,q1c,lensFocalLength,lensHeight,pressure, pulse_voltage, jetLength, fractureRadius, laser,
                                     text, height, width,isHeightValid, isWidthValid, intersect_count,
                                     idl_90, idl_85, idl_80)
             savePlumeImageIntoDirectory("lift_off_images",
@@ -1239,7 +1248,7 @@ def createAnalysis(plumes, skipContours = True, evaluateLiftOff = False, evaluat
             savePlumeImageIntoDirectory("perfect_plume_images",
                                         bubble_image_contour, imageDirectory, name)
             savePlumeIntoDirectory("perfect_plume_data", name, directory,
-                                   setDelay,lifetime,voltage,q1c,lensFocalLength,lensHeight,pressure,pulse_voltage, jetLength, fractureRadius,
+                                   setDelay,lifetime,voltage,q1c,lensFocalLength,lensHeight,pressure,pulse_voltage, jetLength, fractureRadius, laser,
                                     text, height, width,isHeightValid, isWidthValid, intersect_count,
                                     idl_90, idl_85, idl_80)           
             
@@ -1254,7 +1263,7 @@ def createAnalysis(plumes, skipContours = True, evaluateLiftOff = False, evaluat
             savePlumeImageIntoDirectory("fracture_images",
                                         bubble_image_contour, imageDirectory, name)
             savePlumeIntoDirectory("fracture_data", name, directory,
-                                   setDelay,lifetime,voltage,q1c,lensFocalLength,lensHeight,pressure,pulse_voltage, jetLength, fractureRadius,
+                                   setDelay,lifetime,voltage,q1c,lensFocalLength,lensHeight,pressure,pulse_voltage, jetLength, fractureRadius, laser,
                                     text, height, width,isHeightValid, isWidthValid, intersect_count,
                                     idl_90, idl_85, idl_80)           
 
@@ -1264,7 +1273,7 @@ def createAnalysis(plumes, skipContours = True, evaluateLiftOff = False, evaluat
         # Make this a method - savePlumeIntoDirectory(isLiftOff, isPerfect, isFracture) - change so that it could save all of the original elements
 
         savePlumeIntoDirectory("analysis_data", name, directory,
-                               setDelay,lifetime,voltage,q1c,lensFocalLength,lensHeight,pressure,pulse_voltage, jetLength, fractureRadius,
+                               setDelay,lifetime,voltage,q1c,lensFocalLength,lensHeight,pressure,pulse_voltage, jetLength, fractureRadius, laser,
                                text, height, width,isHeightValid, isWidthValid, intersect_count,
                                idl_90, idl_85, idl_80)
         
